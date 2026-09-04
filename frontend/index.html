@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microservicio de Usuarios</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #4a3f8a;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+        .note {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 24px;
+        }
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        input[type="text"], input[type="email"] {
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        button:hover { opacity: 0.9; }
+        button:active { transform: scale(0.97); }
+        .btn-create { background: #667eea; color: #fff; }
+        .btn-edit { background: #f39c12; color: #fff; padding: 6px 12px; font-size: 12px; }
+        .btn-delete { background: #e74c3c; color: #fff; padding: 6px 12px; font-size: 12px; }
+        .btn-cancel { background: #95a5a6; color: #fff; padding: 12px 20px; }
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+        }
+        .message.error { background: #fdecea; color: #c0392b; display: block; }
+        .message.success { background: #eafaf1; color: #27ae60; display: block; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #f5f5f5;
+            text-align: left;
+            padding: 12px;
+            font-size: 13px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        tr:hover td { background: #fafafa; }
+        .actions { display: flex; gap: 8px; }
+        .empty {
+            text-align: center;
+            color: #aaa;
+            padding: 32px;
+        }
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            background: #eafaf1;
+            color: #27ae60;
+        }
+        @media (max-width: 600px) {
+            form { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👤 Usuarios</h1>
+        <p class="subtitle">Microservicio CRUD básico</p>
+        <p class="note" id="apiStatus">Conectando a la API...</p>
+
+        <div id="message" class="message"></div>
+
+        <form id="userForm">
+            <input type="hidden" id="userId">
+            <input type="text" id="name" placeholder="Nombre" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <button type="submit" class="btn-create" id="submitBtn">Crear</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="userTable">
+                <tr><td colspan="4" class="empty">No hay usuarios</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const form = document.getElementById('userForm');
+        const userIdInput = document.getElementById('userId');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const submitBtn = document.getElementById('submitBtn');
+        const table = document.getElementById('userTable');
+        const message = document.getElementById('message');
+        const apiStatus = document.getElementById('apiStatus');
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = 'message ' + type;
+            setTimeout(() => { message.className = 'message'; }, 4000);
+        }
+
+        const API_BASE = (window.location.protocol === 'file:')
+            ? 'http://127.0.0.1:8000'
+            : location.protocol + '//' + location.hostname + ':8000';
+
+        async function api(method, url, body) {
+            const res = await fetch(API_BASE + url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: body ? JSON.stringify(body) : undefined
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.detail || 'Error ' + res.status);
+            }
+            return res.status === 204 ? null : res.json();
+        }
+
+        async function loadUsers() {
+            try {
+                const users = await api('GET', '/users/');
+                renderUsers(users);
+                apiStatus.textContent = 'API conectada ✓';
+                apiStatus.style.color = '#27ae60';
+            } catch (e) {
+                apiStatus.textContent = 'API no disponible: ' + e.message;
+                apiStatus.style.color = '#e74c3c';
+            }
+        }
+
+        function renderUsers(users) {
+            if (!users.length) {
+                table.innerHTML = '<tr><td colspan="4" class="empty">No hay usuarios</td></tr>';
+                return;
+            }
+            table.innerHTML = users.map(u => `
+                <tr>
+                    <td>${u.id}</td>
+                    <td>${u.name}</td>
+                    <td>${u.email}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn-edit" onclick="editUser(${u.id}, '${u.name}', '${u.email}')">Editar</button>
+                            <button class="btn-delete" onclick="deleteUser(${u.id})">Eliminar</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function editUser(id, name, email) {
+            userIdInput.value = id;
+            nameInput.value = name;
+            emailInput.value = email;
+            submitBtn.textContent = 'Actualizar';
+            nameInput.focus();
+        }
+
+        async function deleteUser(id) {
+            if (!confirm('¿Eliminar este usuario?')) return;
+            try {
+                await api('DELETE', '/users/' + id);
+                showMessage('Usuario eliminado', 'success');
+                loadUsers();
+            } catch (e) {
+                showMessage(e.message, 'error');
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = userIdInput.value;
+            const data = { name: nameInput.value, email: emailInput.value };
+
+            try {
+                if (id) {
+                    await api('PUT', '/users/' + id, data);
+                    showMessage('Usuario actualizado', 'success');
+                    userIdInput.value = '';
+                    submitBtn.textContent = 'Crear';
+                } else {
+                    await api('POST', '/users/', data);
+                    showMessage('Usuario creado', 'success');
+                }
+                form.reset();
+                loadUsers();
+            } catch (e) {
+                showMessage(e.message, 'error');
+            }
+        });
+
+        loadUsers();
+    </script>
+</body>
+</html>
