@@ -106,3 +106,42 @@ Durante el desarrollo del proyecto se utilizaron herramientas de Inteligencia Ar
 - Organizar la documentacion tecnica del proyecto.
 
 
+Los integrantes pueden trabajar en ramas independientes sin modificar
+directamente la versión estable.
+
+### Recuperación
+
+Si una modificación genera un problema, Git permite revisar el historial
+y recuperar una versión anterior.
+
+### Integración controlada
+
+Los cambios no tienen que incorporarse inmediatamente a la rama principal.
+Pueden ser revisados antes de realizar el merge.
+
+# 6. Modelos de ramificación
+
+Existen diferentes estrategias para organizar el trabajo mediante ramas.
+
+En este proyecto se consideran tres modelos principales:
+
+1. GitFlow.
+2. GitHub Flow.
+3. Trunk-Based Development.
+
+# 7. GitFlow
+
+GitFlow organiza el desarrollo utilizando diferentes tipos de ramas según
+la función que cumplen dentro del proyecto.
+
+La estructura utilizada en este proyecto es:
+
+```text
+main
+develop
+feature/<nombre>
+hotfix/<nombre>
+
+## Prueba de integración CI/CD
+
+Esta modificación se utiliza para verificar la ejecución automática del workflow de GitHub Actions mediante un Pull Request.
