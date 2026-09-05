@@ -41,7 +41,11 @@ def index():
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "service": "Microservicio de Usuarios"
+    }
+
 
 @app.get("/info")
 def service_info():
