@@ -14,7 +14,7 @@
             color: #333;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px; /* Amplié un poco el contenedor para que quepan bien las 4 columnas */
             margin: 0 auto;
             background: #fff;
             border-radius: 16px;
@@ -40,18 +40,21 @@
         }
         form {
             display: grid;
-            grid-template-columns: 1fr 1fr auto;
+            /* Cambiado a 4 columnas: Nombre, Email, Sexo, Botón */
+            grid-template-columns: 1fr 1fr 1fr auto; 
             gap: 12px;
             margin-bottom: 28px;
         }
-        input[type="text"], input[type="email"] {
+        /* Añadido select a los estilos de input */
+        input[type="text"], input[type="email"], select {
             padding: 12px 14px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 14px;
             transition: border-color 0.2s;
+            background-color: #fff;
         }
-        input:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -104,14 +107,6 @@
             color: #aaa;
             padding: 32px;
         }
-        .status {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            background: #eafaf1;
-            color: #27ae60;
-        }
         @media (max-width: 600px) {
             form { grid-template-columns: 1fr; }
         }
@@ -129,6 +124,12 @@
             <input type="hidden" id="userId">
             <input type="text" id="name" placeholder="Nombre" required>
             <input type="email" id="email" placeholder="Email" required>
+            <select id="sex" required>
+                <option value="" disabled selected>Sexo</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+            </select>
             <button type="submit" class="btn-create" id="submitBtn">Crear</button>
         </form>
 
@@ -138,11 +139,11 @@
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Email</th>
-                    <th>Acciones</th>
+                    <th>Sexo</th> <th>Acciones</th>
                 </tr>
             </thead>
             <tbody id="userTable">
-                <tr><td colspan="4" class="empty">No hay usuarios</td></tr>
+                <tr><td colspan="5" class="empty">No hay usuarios</td></tr>
             </tbody>
         </table>
     </div>
@@ -152,6 +153,7 @@
         const userIdInput = document.getElementById('userId');
         const nameInput = document.getElementById('name');
         const emailInput = document.getElementById('email');
+        const sexInput = document.getElementById('sex'); // Referencia al nuevo campo
         const submitBtn = document.getElementById('submitBtn');
         const table = document.getElementById('userTable');
         const message = document.getElementById('message');
@@ -194,7 +196,7 @@
 
         function renderUsers(users) {
             if (!users.length) {
-                table.innerHTML = '<tr><td colspan="4" class="empty">No hay usuarios</td></tr>';
+                table.innerHTML = '<tr><td colspan="5" class="empty">No hay usuarios</td></tr>';
                 return;
             }
             table.innerHTML = users.map(u => `
@@ -202,9 +204,9 @@
                     <td>${u.id}</td>
                     <td>${u.name}</td>
                     <td>${u.email}</td>
-                    <td>
+                    <td>${u.sex || '-'}</td> <td>
                         <div class="actions">
-                            <button class="btn-edit" onclick="editUser(${u.id}, '${u.name}', '${u.email}')">Editar</button>
+                            <button class="btn-edit" onclick="editUser(${u.id}, '${u.name}', '${u.email}', '${u.sex || ''}')">Editar</button>
                             <button class="btn-delete" onclick="deleteUser(${u.id})">Eliminar</button>
                         </div>
                     </td>
@@ -212,10 +214,12 @@
             `).join('');
         }
 
-        function editUser(id, name, email) {
+        // Añadido el parámetro "sex" a la función
+        function editUser(id, name, email, sex) {
             userIdInput.value = id;
             nameInput.value = name;
             emailInput.value = email;
+            sexInput.value = sex; // Rellenar el select con el valor correspondiente
             submitBtn.textContent = 'Actualizar';
             nameInput.focus();
         }
@@ -234,7 +238,12 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = userIdInput.value;
-            const data = { name: nameInput.value, email: emailInput.value };
+            // Incluimos el nuevo campo en la carga útil (payload) de la API
+            const data = { 
+                name: nameInput.value, 
+                email: emailInput.value,
+                sex: sexInput.value
+            };
 
             try {
                 if (id) {
