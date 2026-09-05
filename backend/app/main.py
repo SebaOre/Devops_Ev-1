@@ -45,3 +45,12 @@ def health_check():
         "status": "ok",
         "service": "Microservicio de Usuarios"
     }
+
+
+@app.get("/info")
+def service_info():
+    return {
+        "service": "Microservicio de Usuarios",
+        "version": "1.0.0",
+        "status": "running"
+    }
