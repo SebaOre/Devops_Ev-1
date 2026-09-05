@@ -153,3 +153,7 @@ main
 develop
 feature/<nombre>
 hotfix/<nombre>
+
+## Prueba de integración CI/CD
+
+Esta modificación se utiliza para verificar la ejecución automática del workflow de GitHub Actions mediante un Pull Request.
