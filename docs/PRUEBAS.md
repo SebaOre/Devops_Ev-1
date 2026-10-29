@@ -84,8 +84,9 @@ el job falla. La proteccion de ramas para exigir este check antes de integrar
 cambios se configurara al completar el pipeline.
 
 Las etapas de SonarQube y construccion dependen de estas pruebas. El flujo y los
-artefactos se describen en [PIPELINE.md](PIPELINE.md). El despliegue automatico
-corresponde al paso 8.
+artefactos se describen en [PIPELINE.md](PIPELINE.md). El job de despliegue agrega
+pruebas reales de APIs y persistencia sobre las imagenes aprobadas, descritas
+en [DESPLIEGUE.md](DESPLIEGUE.md).
 
 ## Referencias tecnicas
 

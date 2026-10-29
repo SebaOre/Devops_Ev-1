@@ -114,6 +114,8 @@ El workflow enlaza las comprobaciones de seguridad con la construccion:
    y ejecuta `python scripts/sonarqube_local.py --ci` en Linux.
 3. `build`: necesita la aprobacion de ambos y construye y verifica las imagenes
    identificadas por commit; los detalles estan en [PIPELINE.md](PIPELINE.md).
+4. `deploy`: necesita las etapas anteriores aprobadas y verifica el mismo
+   paquete en Compose, con pruebas funcionales y retiro de recursos temporales.
 
 Con `--ci`, SonarQube se crea dentro del runner con un nombre y puerto temporales.
 Las credenciales se mantienen en memoria y la instancia se elimina al terminar.
@@ -123,8 +125,8 @@ instancia independiente, sin usar la funcion de multiples ramas de la edicion
 Community.
 
 Ambos jobs generan anotaciones `::error::` si fallan. Los reportes quedan como
-artefactos durante siete dias. La construccion ya depende de estos jobs y el
-despliegue se incorporara en el paso 8. Para bloquear
+artefactos durante siete dias. La construccion y el despliegue dependen de la
+aprobacion de los controles de calidad y seguridad. Para bloquear
 tambien el merge, se deben exigir los checks de validacion y SonarQube mediante
 proteccion de ramas en GitHub. La configuracion local por si sola no activa esa
 proteccion ni acredita una ejecucion remota.

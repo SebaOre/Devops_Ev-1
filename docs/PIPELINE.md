@@ -12,6 +12,9 @@ desde GitHub Actions. Utiliza runners `ubuntu-24.04` y Python 3.11.
    Necesita que `validate` apruebe y exige un Quality Gate correcto.
 3. `build`: necesita que ambos jobs anteriores aprueben. Valida Compose,
    construye los dos Dockerfile y verifica el paquete de imagenes.
+4. `deploy`: necesita los tres jobs aprobados. Descarga el paquete de esta
+   ejecucion, verifica su identidad y despliega y prueba Compose en un runner
+   nuevo. Guarda evidencia y retira los recursos temporales al terminar.
 
 Los fallos detienen las etapas dependientes y generan una anotacion de error.
 No se utiliza `continue-on-error`. La proteccion de ramas para exigir checks al
@@ -38,8 +41,10 @@ compresion adicional del servicio de artefactos. No requiere una cuenta de
 registro de contenedores. Los reportes de pruebas/auditoria y SonarQube se
 guardan en artefactos separados, tambien durante siete dias.
 
-La etapa siguiente de despliegue debe recuperar este paquete y verificarlo,
-para ejecutar las mismas imagenes aprobadas sin reconstruirlas.
+El despliegue recupera este paquete y lo verifica para ejecutar las mismas
+imagenes aprobadas sin reconstruirlas. El manifiesto debe corresponder al
+repositorio, commit, ID e intento de ejecucion actuales. La simulacion y sus
+pruebas estan documentadas en [DESPLIEGUE.md](DESPLIEGUE.md).
 
 ## Comprobacion local
 
@@ -76,4 +81,5 @@ con seguridad A y cero observaciones o hotspots. Ambas imagenes se construyeron,
 se cargaron y se verificaron antes de publicar
 `imagenes-7d0cb705fd9c719104b7e7b295dc535b602d02fa`.
 El artefacto publicado tiene ID `12918576874` y ocupa 81.842.820 bytes.
-El despliegue automatico se incorporara en el paso 8.
+Esta ejecucion corresponde al paso 7. La incorporacion y evidencia del job
+`deploy` se registran en el paso 8 de [PROGRESO_EP2.md](PROGRESO_EP2.md).

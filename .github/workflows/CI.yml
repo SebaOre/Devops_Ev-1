@@ -1,4 +1,4 @@
-name: CI - Pruebas, seguridad e imagenes
+name: CI-CD - Pruebas, seguridad y despliegue simulado
 
 on:
   push:
@@ -153,3 +153,41 @@ jobs:
       - name: Informar fallo de construccion
         if: failure()
         run: echo "::error::No se pudo construir o verificar el paquete de imagenes. Se bloquea el despliegue."
+
+  deploy:
+    name: Desplegar y verificar entorno simulado
+    needs: [validate, sonar, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Descargar el mismo commit de las imagenes
+        uses: actions/checkout@v6
+
+      - name: Configurar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Recuperar las imagenes aprobadas de esta ejecucion
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.build.outputs.artifact_name }}
+          path: artifacts/
+
+      - name: Desplegar las imagenes y probar el entorno temporal
+        env:
+          EXPECTED_REVISION: ${{ needs.build.outputs.revision }}
+        run: python scripts/desplegar_simulado.py --revision "$EXPECTED_REVISION"
+
+      - name: Guardar evidencia y diagnostico del despliegue
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: despliegue-${{ github.sha }}
+          path: reports/despliegue-*
+          retention-days: 7
+          overwrite: true
+
+      - name: Informar fallo de despliegue
+        if: failure()
+        run: echo "::error::El despliegue simulado no pudo verificarse. Consulta sus reportes y logs; la entrega no fue aprobada."

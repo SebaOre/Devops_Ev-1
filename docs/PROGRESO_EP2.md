@@ -222,11 +222,38 @@ El artefacto de imagenes tiene ID `12918576874` y un tamano publicado de
 81.842.820 bytes. Los reportes remotos se descargaron tambien en
 `reports/github-run-40921001795/`, excluido de Git.
 
-El despliegue automatico todavia no forma parte del workflow: corresponde al
+Al completar el paso 7, el despliegue automatico aun estaba pendiente para el
 paso 8. Dependabot debe integrarse en la rama predeterminada y la proteccion de
 ramas aun debe configurarse al preparar la entrega.
 
 Los detalles del flujo y los comandos locales estan en [PIPELINE.md](PIPELINE.md).
+
+## Verificacion del paso 8/10
+
+Se incorporo el job `deploy`, dependiente de `validate`, `sonar` y `build`.
+Recupera el paquete del mismo commit y ejecucion, verifica integridad e identidad
+y ejecuta Compose con `--no-build --pull never --wait` en un runner nuevo.
+Cada simulacion tiene proyecto, puerto y volumen propios.
+
+El 29 de octubre de 2026 se verifico localmente
+`scripts/desplegar_simulado.py --revision working-tree`, usando el paquete de
+comprobacion del paso 7. Termino con codigo 0 y comprobo:
+
+- Tres servicios saludables e identidades de imagen coincidentes con el manifiesto.
+- Frontend, salud, CRUD y resumen de dominios mediante el proxy.
+- Persistencia de dos registros al recrear el contenedor de usuarios.
+- Recuperacion de las consultas de estadisticas y eliminacion final de registros.
+- Retiro completo de los contenedores, redes y volumenes del proyecto temporal.
+
+Un segundo ensayo con `--simulate-failure` produjo el codigo 1 esperado y un
+reporte `failed`, con error intencional, diagnostico guardado y limpieza
+completada. La aplicacion normal continuo con sus tres servicios saludables
+en `http://localhost:18080`.
+
+El workflow ampliado paso actionlint 1.7.12. Falta comprobar su ejecucion remota
+completa antes de marcar este paso terminado.
+
+Los comandos, limites y evidencias se describen en [DESPLIEGUE.md](DESPLIEGUE.md).
 
 ## Documentacion pendiente para la entrega
 
