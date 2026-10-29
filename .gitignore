@@ -1,5 +1,13 @@
 venv/
+.venv/
 __pycache__/
 *.pyc
 .env
 *.db
+.pytest_cache/
+.coverage
+.coverage.*
+reports/
+.sonar-local/
+.scannerwork/
+artifacts/

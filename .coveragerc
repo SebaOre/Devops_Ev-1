@@ -1,0 +1,17 @@
+[run]
+relative_files = True
+source =
+    .
+branch = True
+omit =
+    .venv/*
+    tests/*
+    scripts/*
+
+[report]
+include =
+    backend/app/*
+    estadisticas/app/*
+
+[xml]
+package_depth = 0

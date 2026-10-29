@@ -1,40 +1,155 @@
-name: CI - Validacion del proyecto
+name: CI - Pruebas, seguridad e imagenes
 
 on:
   push:
     branches:
       - develop
+      - main
+      - "feature/**"
+      - "codex/**"
 
   pull_request:
     branches:
       - main
+      - develop
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:
-    name: Validar backend
-    runs-on: ubuntu-latest
+    name: Validar y probar microservicios
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
 
     steps:
       - name: Descargar repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configurar Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
       - name: Instalar dependencias
-        working-directory: backend
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install -r requirements-test.txt -r requirements-security.txt
 
       - name: Validar sintaxis Python
         run: |
-          python -m compileall backend/app
+          python -m compileall backend/app estadisticas/app
+
+      - name: Ejecutar pruebas y verificar cobertura minima del 90 por ciento
+        run: python -m pytest
+
+      - name: Auditar dependencias y bloquear si hay vulnerabilidades
+        run: python scripts/auditar_dependencias.py
 
       - name: Verificar estructura
         run: |
           test -f backend/app/main.py
           test -f backend/requirements.txt
           test -f frontend/index.html
+          test -f estadisticas/app/main.py
+          test -f estadisticas/requirements.txt
+
+      - name: Guardar reportes de pruebas y dependencias
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pruebas-y-dependencias
+          path: reports/
+          retention-days: 7
+          overwrite: true
+
+      - name: Informar fallo de calidad o dependencias
+        if: failure()
+        run: echo "::error::Las pruebas, la cobertura o la auditoria fallaron. Se bloquean las etapas posteriores."
+
+  sonar:
+    name: SonarQube - Quality Gate
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v6
+
+      - name: Configurar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Recuperar cobertura de la etapa de pruebas
+        uses: actions/download-artifact@v8
+        with:
+          name: pruebas-y-dependencias
+          path: reports/
+
+      - name: Preparar requisito de Elasticsearch en el runner temporal
+        run: sudo sysctl -w vm.max_map_count=524288
+
+      - name: Analizar codigo y exigir aprobacion del Quality Gate
+        run: python scripts/sonarqube_local.py --ci
+
+      - name: Guardar resultados de SonarQube
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: sonarqube
+          path: reports/sonarqube-*.json
+          retention-days: 7
+          overwrite: true
+
+      - name: Informar bloqueo de seguridad
+        if: failure()
+        run: echo "::error::SonarQube no aprobo el Quality Gate o no pudo completar el analisis. Se bloquea la entrega."
+
+  build:
+    name: Construir y empaquetar imagenes
+    needs: [validate, sonar]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      revision: ${{ github.sha }}
+      artifact_name: imagenes-${{ github.sha }}
+    steps:
+      - name: Descargar el commit aprobado
+        uses: actions/checkout@v6
+
+      - name: Configurar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Validar la configuracion de orquestacion
+        run: docker compose config --quiet
+
+      - name: Construir ambas imagenes y guardar su manifiesto
+        run: python scripts/construir_imagenes.py
+
+      - name: Verificar el paquete que recibira el despliegue
+        run: python scripts/verificar_artefactos.py --load
+
+      - name: Guardar imagenes y trazabilidad del commit
+        uses: actions/upload-artifact@v7
+        with:
+          name: imagenes-${{ github.sha }}
+          path: |
+            artifacts/images.tar.gz
+            artifacts/images-manifest.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+          overwrite: true
+
+      - name: Informar fallo de construccion
+        if: failure()
+        run: echo "::error::No se pudo construir o verificar el paquete de imagenes. Se bloquea el despliegue."

@@ -122,9 +122,9 @@
 
         <form id="userForm">
             <input type="hidden" id="userId">
-            <input type="text" id="name" placeholder="Nombre" required>
-            <input type="email" id="email" placeholder="Email" required>
-            <select id="sex" required>
+            <input type="text" id="name" placeholder="Nombre" aria-label="Nombre" required>
+            <input type="email" id="email" placeholder="Email" aria-label="Correo electronico" required>
+            <select id="sex" aria-label="Sexo" required>
                 <option value="" disabled selected>Sexo</option>
                 <option value="Masculino">Masculino</option>
                 <option value="Femenino">Femenino</option>
@@ -167,7 +167,7 @@
 
         const API_BASE = (window.location.protocol === 'file:')
             ? 'http://127.0.0.1:8000'
-            : location.protocol + '//' + location.hostname + ':8000';
+            : window.location.origin;
 
         async function api(method, url, body) {
             const res = await fetch(API_BASE + url, {
@@ -195,23 +195,47 @@
         }
 
         function renderUsers(users) {
+            table.replaceChildren();
             if (!users.length) {
-                table.innerHTML = '<tr><td colspan="5" class="empty">No hay usuarios</td></tr>';
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 5;
+                cell.className = 'empty';
+                cell.textContent = 'No hay usuarios';
+                row.appendChild(cell);
+                table.appendChild(row);
                 return;
             }
-            table.innerHTML = users.map(u => `
-                <tr>
-                    <td>${u.id}</td>
-                    <td>${u.name}</td>
-                    <td>${u.email}</td>
-                    <td>${u.sex || '-'}</td> <td>
-                        <div class="actions">
-                            <button class="btn-edit" onclick="editUser(${u.id}, '${u.name}', '${u.email}', '${u.sex || ''}')">Editar</button>
-                            <button class="btn-delete" onclick="deleteUser(${u.id})">Eliminar</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+            for (const user of users) {
+                const row = document.createElement('tr');
+                for (const value of [user.id, user.name, user.email, user.sex || '-']) {
+                    const cell = document.createElement('td');
+                    cell.textContent = String(value);
+                    row.appendChild(cell);
+                }
+                const actionsCell = document.createElement('td');
+                const actions = document.createElement('div');
+                actions.className = 'actions';
+
+                const editButton = document.createElement('button');
+                editButton.type = 'button';
+                editButton.className = 'btn-edit';
+                editButton.textContent = 'Editar';
+                editButton.addEventListener('click', () => {
+                    editUser(user.id, user.name, user.email, user.sex || '');
+                });
+
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'btn-delete';
+                deleteButton.textContent = 'Eliminar';
+                deleteButton.addEventListener('click', () => deleteUser(user.id));
+
+                actions.append(editButton, deleteButton);
+                actionsCell.appendChild(actions);
+                row.appendChild(actionsCell);
+                table.appendChild(row);
+            }
         }
 
         // Añadido el parámetro "sex" a la función
