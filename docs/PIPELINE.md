@@ -62,4 +62,10 @@ ocho casos que comprueban el rechazo de paquetes alterados, commits incorrectos,
 servicios ausentes e identidad o etiquetas incompatibles. El workflow tambien
 paso la validacion estatica con actionlint 1.7.12.
 
-La ejecucion remota se registrara despues de subir esta configuracion.
+La primera ejecucion remota aprobo las 57 pruebas y bloqueo la entrega al
+detectar avisos de seguridad en `setuptools` 79.0.1, preinstalado en el runner.
+Se incorporo `setuptools==84.1.0` a las herramientas de seguridad para actualizar
+esa dependencia al preparar el entorno. La imagen base Python tambien incluia
+79.0.1, por lo que ambos Dockerfile actualizan esta herramienta a 84.1.0.
+No se ignoraron avisos de la auditoria.
+El resultado completo se registrara despues de repetir el pipeline.

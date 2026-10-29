@@ -9,7 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 COPY estadisticas/requirements.txt ./requirements.txt
-RUN python -m pip install --upgrade pip==26.2.2 \
+RUN python -m pip install --upgrade pip==26.2.2 setuptools==84.1.0 \
     && python -m pip install -r requirements.txt
 
 RUN groupadd --gid 10001 app \
