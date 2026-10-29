@@ -8,7 +8,7 @@ Cada paso se marca al terminar su verificacion.
 - [x] 4/10 Incorporar pruebas automatizadas con PyTest.
 - [x] 5/10 Configurar Dependabot, analisis de seguridad y bloqueo ante fallos.
 - [x] 6/10 Configurar Docker Compose, persistencia, salud, seguridad y escalabilidad.
-- [ ] 7/10 Integrar construccion, pruebas y analisis en GitHub Actions.
+- [x] 7/10 Integrar construccion, pruebas y analisis en GitHub Actions.
 - [ ] 8/10 Automatizar el despliegue simulado y su trazabilidad.
 - [ ] 9/10 Documentar funcionamiento, calidad, evidencias y uso de IA.
 - [ ] 10/10 Verificar la pauta completa y preparar la entrega del enlace de GitHub.
@@ -181,6 +181,52 @@ servicios `healthy`, y las rutas `/`, `/health`, `/stats` y `/users` respondiero
 correctamente. SonarQube permanece detenido para liberar memoria.
 
 Los comandos de inicio, escalado y detencion estan en [COMPOSE.md](COMPOSE.md).
+
+## Verificacion del paso 7/10
+
+Se integraron los jobs `validate`, `sonar` y `build` en GitHub Actions, con
+dependencias que impiden construir si las pruebas, la auditoria o el Quality
+Gate fallan. Las imagenes se identifican por el SHA completo del commit y se
+empaquetan junto con un manifiesto de identidad y checksum.
+
+La comprobacion local construyo y cargo ambas imagenes desde el archivo
+comprimido y verifico su integridad, identificadores y etiquetas OCI. Se
+agregaron ocho casos de integridad: la suite completa paso 57 pruebas con
+99,60% de cobertura de los servicios. El workflow paso actionlint 1.7.12.
+
+La rama `feature/evaluacion-2` se subio al repositorio configurado. La
+[primera ejecucion real](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40920411784)
+aprobo las 57 pruebas, pero detecto tres registros de avisos en `setuptools`
+79.0.1, preinstalado en el runner. Los servicios no presentaron dependencias
+vulnerables; SonarQube y la construccion quedaron bloqueados como correspondia.
+
+Se actualizo `setuptools` a 84.1.0 en las herramientas y en ambos Dockerfile,
+despues de confirmar que la imagen base tambien incluia 79.0.1. La auditoria
+local posterior aprobo usuarios (23 paquetes), estadisticas (14) y el entorno
+(60), todos con cero vulnerabilidades conocidas.
+
+La segunda ejecucion, sobre el commit
+`7d0cb705fd9c719104b7e7b295dc535b602d02fa`, termino correctamente:
+
+| Etapa remota | Resultado |
+| --- | --- |
+| PyTest, Python 3.11.17 | 57 aprobadas, cobertura 99,60%. |
+| Auditoria de dependencias | Usuarios: 23 paquetes; estadisticas: 14; entorno: 59; cero avisos. |
+| SonarQube | Quality Gate OK, seguridad A, cobertura 99,6%, cero observaciones y hotspots. |
+| Construccion | Dos imagenes identificadas por el SHA completo del commit. |
+| Verificacion del paquete | Carga correcta, checksum e identidad y etiquetas OCI coincidentes. |
+| Publicacion | Artefactos de pruebas/dependencias, SonarQube e imagenes disponibles durante siete dias. |
+
+Evidencia: [ejecucion completa aprobada en GitHub Actions](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40921001795).
+El artefacto de imagenes tiene ID `12918576874` y un tamano publicado de
+81.842.820 bytes. Los reportes remotos se descargaron tambien en
+`reports/github-run-40921001795/`, excluido de Git.
+
+El despliegue automatico todavia no forma parte del workflow: corresponde al
+paso 8. Dependabot debe integrarse en la rama predeterminada y la proteccion de
+ramas aun debe configurarse al preparar la entrega.
+
+Los detalles del flujo y los comandos locales estan en [PIPELINE.md](PIPELINE.md).
 
 ## Documentacion pendiente para la entrega
 

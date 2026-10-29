@@ -71,6 +71,8 @@ SQLAlchemy y Starlette/AnyIO; no hubo fallas de pruebas.
 
 En el paso 7 se agregaron ocho casos para la integridad de los artefactos. La
 suite de Windows paso los 57 casos y mantuvo la cobertura de servicios en 99,60%.
+La [ejecucion real de GitHub Actions](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40921001795)
+aprobo tambien los 57 casos con Python 3.11.17 y cobertura de 99,60%.
 
 ## Integracion continua
 

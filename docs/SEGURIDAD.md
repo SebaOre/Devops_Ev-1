@@ -83,9 +83,10 @@ El proyecto usa el gate `EP2 Security`, aplicado sobre todo el codigo analizado:
 | Clasificacion de seguridad | A, valor numerico 1. |
 | Cobertura de codigo | Al menos 90%. |
 
-El gate de la version verificada tambien conserva las condiciones de nuevo
-codigo de SonarQube: cero observaciones nuevas y duplicacion de lineas no
-superior al 3%.
+La instancia local verificada tambien conserva condiciones de nuevo codigo:
+cero observaciones nuevas y duplicacion de lineas no superior al 3%. Las
+instancias nuevas del runner crean el gate con las dos condiciones explicitas
+de la tabla: seguridad A y cobertura de al menos 90%.
 
 Se analizan los dos servicios Python y el frontend. La cobertura procede de las
 pruebas Python; el frontend sigue siendo analizado por seguridad y calidad, pero
@@ -186,6 +187,13 @@ ejecucion y se vuelven a calcular en cada pipeline.
 
 Ambas imagenes actualizadas pasaron la comprobacion de contenedores. SonarQube
 quedo detenido para liberar memoria; su panel se puede recuperar con
-`docker start ep2-sonarqube`. La ejecucion en GitHub Actions y la activacion de
-Dependabot en la rama predeterminada todavia deben comprobarse al subir los
-cambios.
+`docker start ep2-sonarqube`.
+
+La [ejecucion remota del paso 7](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40921001795)
+aprobo pruebas, auditorias, SonarQube y construccion de imagenes. La auditoria
+remota reviso 23 paquetes de usuarios, 14 de estadisticas y 59 del entorno,
+sin vulnerabilidades conocidas. SonarQube informo seguridad A, cobertura
+99,6%, cero observaciones y cero hotspots. Se actualizo tambien `setuptools`
+a 84.1.0 en las herramientas y los Dockerfile tras detectar una version
+vulnerable preinstalada en el runner y la imagen base. La activacion de
+Dependabot en la rama predeterminada y la proteccion de ramas siguen pendientes.

@@ -68,4 +68,12 @@ Se incorporo `setuptools==84.1.0` a las herramientas de seguridad para actualiza
 esa dependencia al preparar el entorno. La imagen base Python tambien incluia
 79.0.1, por lo que ambos Dockerfile actualizan esta herramienta a 84.1.0.
 No se ignoraron avisos de la auditoria.
-El resultado completo se registrara despues de repetir el pipeline.
+
+La [segunda ejecucion](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40921001795),
+del commit `7d0cb705fd9c719104b7e7b295dc535b602d02fa`, aprobo los tres jobs:
+57 pruebas, cobertura 99,60%, cero vulnerabilidades conocidas, Quality Gate OK
+con seguridad A y cero observaciones o hotspots. Ambas imagenes se construyeron,
+se cargaron y se verificaron antes de publicar
+`imagenes-7d0cb705fd9c719104b7e7b295dc535b602d02fa`.
+El artefacto publicado tiene ID `12918576874` y ocupa 81.842.820 bytes.
+El despliegue automatico se incorporara en el paso 8.
