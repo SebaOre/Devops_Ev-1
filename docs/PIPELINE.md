@@ -83,3 +83,8 @@ se cargaron y se verificaron antes de publicar
 El artefacto publicado tiene ID `12918576874` y ocupa 81.842.820 bytes.
 Esta ejecucion corresponde al paso 7. La incorporacion y evidencia del job
 `deploy` se registran en el paso 8 de [PROGRESO_EP2.md](PROGRESO_EP2.md).
+
+La [ejecucion del paso 8](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543),
+del commit `0243f603d69c777e197463febb7ded705f8c59f7`, aprobo los cuatro jobs,
+incluyendo despliegue, pruebas funcionales, persistencia y retiro del proyecto
+temporal. Los detalles de trazabilidad estan en [DESPLIEGUE.md](DESPLIEGUE.md).

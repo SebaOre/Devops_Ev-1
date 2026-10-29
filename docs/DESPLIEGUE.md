@@ -51,6 +51,11 @@ persistencia o limpieza devuelve codigo distinto de cero: GitHub marca el job
 como fallido y agrega una anotacion de error. La recoleccion de evidencia se
 ejecuta con `if: always()`.
 
+Para reintentar en GitHub, usar **Re-run all jobs**: el control exige que el
+paquete haya sido construido en el mismo intento que lo despliega. Repetir
+solo `deploy` con un paquete de un intento anterior provoca un rechazo de
+trazabilidad.
+
 El retiro de recursos afecta solo al proyecto aleatorio que genero el script.
 Cada nueva ejecucion comienza con un proyecto y un volumen independientes.
 La simulacion verifica una instalacion temporal; no modela una actualizacion
@@ -93,4 +98,23 @@ todos sus contenedores, redes y volumenes. Los logs y el estado previo al retiro
 quedaron guardados con el sufijo `-fallo`. Los dos ensayos usaron el paquete de
 comprobacion local del paso 7, identificado como `working-tree`.
 
-La ejecucion real de GitHub Actions se registrara al terminar el paso 8.
+La [ejecucion real de GitHub Actions](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543)
+del commit `0243f603d69c777e197463febb7ded705f8c59f7` aprobo los cuatro jobs el
+29 de octubre de 2026. El despliegue cargo las imagenes en un runner nuevo,
+verifico las cinco agrupaciones de pruebas funcionales y termino con estado
+`passed`, etapa `completed` y limpieza completada sin recursos restantes.
+
+| Servicio | ID de imagen construido, cargado y ejecutado |
+| --- | --- |
+| Usuarios | `sha256:8660dd8ce8c22ada95c8ca463d756ff3534c6350462ea4c033a28a0eae6e0ff0` |
+| Estadisticas | `sha256:fc4c19574aa5b9a27dea585d5da68c612695e95c014feae3a7ec38d8a518d32c` |
+
+El archivo `images.tar.gz` midio 81.855.582 bytes y su SHA-256 fue
+`bfe07c0a502f89b4015a9f24e450cc04c527a09dd06e02cf42f2a32b619b04c9`.
+Construccion y despliegue compartieron el ID de ejecucion `40929310543` y el
+intento `1`. El contenedor de usuarios cambio de ID al recrearse, manteniendo
+su imagen y los dos registros verificados.
+
+El [artefacto de despliegue](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/artifacts/12921823648)
+incluye reporte, logs y estado de Compose; su retencion es de siete dias.
+Las copias locales estan en `reports/github-run-40929310543/`, excluido de Git.

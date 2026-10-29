@@ -9,7 +9,7 @@ Cada paso se marca al terminar su verificacion.
 - [x] 5/10 Configurar Dependabot, analisis de seguridad y bloqueo ante fallos.
 - [x] 6/10 Configurar Docker Compose, persistencia, salud, seguridad y escalabilidad.
 - [x] 7/10 Integrar construccion, pruebas y analisis en GitHub Actions.
-- [ ] 8/10 Automatizar el despliegue simulado y su trazabilidad.
+- [x] 8/10 Automatizar el despliegue simulado y su trazabilidad.
 - [ ] 9/10 Documentar funcionamiento, calidad, evidencias y uso de IA.
 - [ ] 10/10 Verificar la pauta completa y preparar la entrega del enlace de GitHub.
 
@@ -250,8 +250,29 @@ reporte `failed`, con error intencional, diagnostico guardado y limpieza
 completada. La aplicacion normal continuo con sus tres servicios saludables
 en `http://localhost:18080`.
 
-El workflow ampliado paso actionlint 1.7.12. Falta comprobar su ejecucion remota
-completa antes de marcar este paso terminado.
+El workflow ampliado paso actionlint 1.7.12. La
+[ejecucion remota completa](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543),
+sobre el commit `0243f603d69c777e197463febb7ded705f8c59f7`, aprobo los cuatro jobs:
+
+| Control remoto | Resultado |
+| --- | --- |
+| PyTest y cobertura | 57 aprobadas; cobertura 99,60%. |
+| Auditorias | Cero avisos en usuarios, estadisticas y entorno. |
+| SonarQube | Quality Gate OK; seguridad A; cero observaciones y hotspots. |
+| Construccion | Ambas imagenes empaquetadas e identificadas por commit. |
+| Despliegue | Paquete cargado en un runner nuevo; tres servicios saludables. |
+| Pruebas funcionales | CRUD, estadisticas y persistencia al recrear usuarios aprobados. |
+| Limpieza | Ningun contenedor, red o volumen del proyecto temporal restante. |
+
+El reporte `despliegue-simulado.json` termino en estado `passed`, etapa
+`completed`, con identidades de imagen iguales a las del manifiesto original.
+La imagen de usuarios se mantuvo al recrear su contenedor. Construccion y
+despliegue correspondieron a la ejecucion `40929310543`, intento `1`.
+
+El artefacto de despliegue tiene ID `12921823648`; los reportes y logs tambien
+quedaron en `reports/github-run-40929310543/`, excluido de Git. Se publicaron
+ademas los artefactos de pruebas/dependencias, SonarQube e imagenes, con
+retencion de siete dias.
 
 Los comandos, limites y evidencias se describen en [DESPLIEGUE.md](DESPLIEGUE.md).
 
