@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Descargar repositorio
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Configurar Python
         uses: actions/setup-python@v6
@@ -80,7 +80,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Descargar repositorio
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Configurar Python
         uses: actions/setup-python@v6
@@ -122,7 +122,7 @@ jobs:
       artifact_name: imagenes-${{ github.sha }}
     steps:
       - name: Descargar el commit aprobado
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Configurar Python
         uses: actions/setup-python@v6
@@ -161,7 +161,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Descargar el mismo commit de las imagenes
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Configurar Python
         uses: actions/setup-python@v6
