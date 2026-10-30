@@ -197,9 +197,8 @@ problemas están reunidas en un solo [manual técnico](docs/MANUAL_TECNICO.md).
 
 ## 7. Uso de inteligencia artificial
 
-La asistencia incluyó revisión de requisitos, modificación de código, pruebas,
-documentación y redacción de la conclusión general.
-También incluyó interpretación de sus resultados.
+La asistencia incluyó revisión de requisitos, modificación de código, pruebas y
+también incluyó interpretación de sus resultados.
 Las firmas de Git identifican la cuenta utilizada y no distinguen por sí solas
 trabajo manual y asistencia.
 
