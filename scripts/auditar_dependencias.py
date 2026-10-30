@@ -12,8 +12,8 @@ def main():
     reports.mkdir(exist_ok=True)
     failed = False
     for name, manifest in (
-        ("usuarios", "backend/requirements.txt"),
-        ("estadisticas", "estadisticas/requirements.txt"),
+        ("usuarios", "backend/requirements.lock"),
+        ("estadisticas", "estadisticas/requirements.lock"),
         ("entorno", None),
     ):
         command = [
@@ -22,7 +22,7 @@ def main():
             "--output", str(reports / f"pip-audit-{name}.json"),
         ]
         if manifest:
-            command.extend(["-r", str(ROOT / manifest)])
+            command.extend(["--require-hashes", "--disable-pip", "-r", str(ROOT / manifest)])
         print(f"Auditando {name}...", flush=True)
         result = subprocess.run(command, cwd=ROOT, timeout=300)
         failed = failed or result.returncode != 0

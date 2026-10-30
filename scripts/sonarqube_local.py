@@ -104,7 +104,9 @@ def prepare_scan_context(destination):
     for filename in (
         "sonar-project.properties", ".coveragerc", "pytest.ini",
         "requirements-test.txt", "requirements-security.txt",
+        "requirements-ci.lock",
         "backend/requirements.txt", "estadisticas/requirements.txt",
+        "backend/requirements.lock", "estadisticas/requirements.lock",
         "backend/Dockerfile", "estadisticas/Dockerfile", "estadisticas/__init__.py",
         "reports/coverage.xml",
     ):

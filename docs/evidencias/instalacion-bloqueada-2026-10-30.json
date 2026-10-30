@@ -1,0 +1,9 @@
+{
+  "platform": "CPython 3.11 Linux amd64",
+  "locked_install": "passed",
+  "pip_check": "passed",
+  "pytest": "passed",
+  "audits": "passed",
+  "tampered_hash_blocked": true,
+  "stale_input_blocked": true
+}

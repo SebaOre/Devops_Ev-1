@@ -8,11 +8,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY estadisticas/requirements.txt ./requirements.txt
-RUN python -m pip install --upgrade pip==26.2.2 setuptools==84.1.0 \
-    && python -m pip install -r requirements.txt
-
-RUN groupadd --gid 10001 app \
+COPY estadisticas/requirements.txt estadisticas/requirements.lock ./
+RUN python -m pip install --only-binary :all: --require-hashes \
+        -r requirements.lock -r requirements.txt \
+    && groupadd --gid 10001 app \
     && useradd --uid 10001 --gid app --no-create-home --shell /usr/sbin/nologin app
 
 COPY estadisticas/app ./app

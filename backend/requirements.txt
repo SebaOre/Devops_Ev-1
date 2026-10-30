@@ -6,3 +6,5 @@ psycopg2-binary==2.9.11
 python-dotenv==1.2.4
 pydantic[email]==2.11.4
 alembic==1.15.2
+pip==26.2.2
+setuptools==84.1.0

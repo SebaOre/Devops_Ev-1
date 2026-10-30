@@ -164,14 +164,46 @@ El proyecto normal de la aplicación se conserva.
 
 ## 4. Seguridad y SonarQube
 
+### Instalación bloqueada de dependencias
+
+Las imágenes y el runner instalan con `--only-binary :all:` y
+`--require-hashes`. Se aceptan wheels con hashes registrados; no se ejecutan
+scripts de instalación de distribuciones fuente. Los locks incluyen todas
+las dependencias transitivas y se resolvieron para CPython 3.11 en Linux amd64:
+
+| Lock | Entorno |
+| --- | --- |
+| `backend/requirements.lock` | Usuarios, 25 paquetes incluidos pip y setuptools. |
+| `estadisticas/requirements.lock` | Estadísticas, 16 paquetes incluidos pip y setuptools. |
+| `requirements-ci.lock` | Pruebas y herramientas, 59 paquetes. |
+
+El instalador recibe también los requisitos originales. Si una actualización
+modifica una versión sin regenerar el lock, la instalación falla por conflicto.
+El ensayo Linux verificó rechazo de un hash alterado y de una versión
+desincronizada, además de la suite y las auditorías.
+
+Para regenerar en Linux con Python 3.11 y pip-tools:
+
+```bash
+python -m piptools compile --generate-hashes --allow-unsafe --strip-extras --output-file backend/requirements.lock backend/requirements.txt
+python -m piptools compile --generate-hashes --allow-unsafe --strip-extras --output-file estadisticas/requirements.lock estadisticas/requirements.txt
+python -m piptools compile --generate-hashes --allow-unsafe --strip-extras --output-file requirements-ci.lock requirements-test.txt requirements-security.txt
+```
+
+Los comandos de desarrollo en Windows usan los requisitos originales; los
+locks anteriores corresponden al entorno Linux validado de contenedores y CI.
+
+### Auditoría y análisis
+
 Auditar las dependencias de cada servicio y el entorno instalado:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/auditar_dependencias.py
 ```
 
-Se generan `reports/pip-audit-usuarios.json`, `pip-audit-estadisticas.json` y
-`pip-audit-entorno.json`. Un aviso o error de auditoría devuelve código distinto
+Se auditan los locks completos de ambos servicios, sin volver a resolver otras
+versiones, y el entorno instalado. Se generan `reports/pip-audit-usuarios.json`,
+`pip-audit-estadisticas.json` y `pip-audit-entorno.json`. Un aviso o error devuelve código distinto
 de cero. Dependabot tiene configuración semanal para Python, Docker y Actions
 en `.github/dependabot.yml`; debe integrarse en la rama predeterminada y tener
 sus opciones habilitadas para completar su activación.
