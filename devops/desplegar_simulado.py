@@ -151,7 +151,7 @@ def main():
             ensure(manifest.get("workflow_run", {}).get("attempt") == os.getenv("GITHUB_RUN_ATTEMPT"),
                    "El paquete proviene de otro intento")
         print("Verificando el paquete y cargando las imagenes aprobadas...", flush=True)
-        verified = run(sys.executable, str(ROOT / "scripts/verificar_artefactos.py"),
+        verified = run(sys.executable, str(ROOT / "devops/verificar_artefactos.py"),
                        "--load", "--revision", args.revision, timeout=240)
         print(verified.stdout, end="", flush=True)
         report["artifact"] = manifest

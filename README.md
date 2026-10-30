@@ -6,6 +6,26 @@
 
 **Documento principal para corregir la evaluación:** este README.
 
+## Organización según la pauta
+
+El repositorio se agrupa en seis carpetas. La interfaz pertenece al servicio
+de usuarios y la automatización y sus configuraciones están reunidas en `devops/`.
+
+```text
+.github/        Pipeline de Actions y Dependabot                    (puntos 2 y 3)
+backend/        Usuarios: código, frontend y Dockerfile              (punto 1)
+estadisticas/   Estadísticas: código y Dockerfile                    (punto 1)
+tests/          Pruebas automatizadas                               (punto 2)
+devops/         Automatización, Nginx y configuración de SonarQube   (puntos 2 a 4)
+docs/           Manual, aportes y evidencias                         (punto 5)
+README.md       Informe principal                                   (punto 5)
+compose.yaml    Orquestación de los contenedores                     (punto 4)
+```
+
+La [revisión de esta estructura en Actions](https://github.com/SebaOre/Devops_Ev-1/actions/workflows/CI.yml?query=branch%3Acodex%2Fordenar-estructura)
+registra las comprobaciones de la reorganización. La configuración local del
+editor y los archivos temporales están excluidos de GitHub.
+
 ## Qué revisar primero
 
 Estas son las tres comprobaciones principales. Cada enlace abre la evidencia
@@ -165,7 +185,7 @@ también aprobó sus cuatro etapas el 30 de octubre. Se conserva su
 Con Docker Desktop en modo Linux, Compose y Python 3.11 o posterior, desde la raíz:
 
 ```powershell
-python scripts/iniciar_compose.py
+python devops/iniciar_compose.py
 docker compose ps
 ```
 
@@ -210,12 +230,13 @@ El equipo debe adecuar el formato de la referencia a la indicación del docente.
 revisa las tres evidencias de la primera tabla y consulta el manual si necesita
 reproducir la aplicación. Los JSON, XML y logs quedan como respaldo.
 
-El [enlace actual de EP2](https://github.com/SebaOre/Devops_Ev-1/tree/feature/evaluacion-2)
-abre esta versión del trabajo. El enlace general del repositorio abre `main`,
-que todavía contiene la versión anterior. La integración se prepara en el
-[PR #7](https://github.com/SebaOre/Devops_Ev-1/pull/7).
+El [PR #7](https://github.com/SebaOre/Devops_Ev-1/pull/7) integró la implementación
+de EP2 en `main`. La [rama de reorganización](https://github.com/SebaOre/Devops_Ev-1/tree/codex/ordenar-estructura)
+permite revisar esta distribución de carpetas antes de integrarla también.
+El [enlace general del repositorio](https://github.com/SebaOre/Devops_Ev-1) abre
+la versión de `main` que verá el docente.
 
-Una vez completada y revisada la entrega, integrar el PR en `main`, comprobar
+Una vez completada y revisada la entrega, integrar la reorganización en `main`, comprobar
 Dependabot y usar [el enlace del repositorio](https://github.com/SebaOre/Devops_Ev-1)
 en AVA y en el correo al docente, dentro del plazo establecido. No se ha
 realizado ese envío desde esta conversación.

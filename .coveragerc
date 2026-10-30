@@ -6,7 +6,7 @@ branch = True
 omit =
     .venv/*
     tests/*
-    scripts/*
+    devops/*
 
 [report]
 include =

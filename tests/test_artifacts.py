@@ -3,7 +3,7 @@ import hashlib
 
 import pytest
 
-from scripts.verificar_artefactos import validate_image, validate_manifest, verify_checksum
+from devops.verificar_artefactos import validate_image, validate_manifest, verify_checksum
 
 
 @pytest.fixture
