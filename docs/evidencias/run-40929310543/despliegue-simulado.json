@@ -1,0 +1,81 @@
+{
+  "project": "ep2-deploy-a0a9b0f323c3",
+  "revision": "0243f603d69c777e197463febb7ded705f8c59f7",
+  "status": "passed",
+  "started_at_utc": "2026-10-29T18:20:53.122202+00:00",
+  "simulation": true,
+  "intentional_failure": false,
+  "workflow_run_id": "40929310543",
+  "workflow_run_attempt": "1",
+  "stage": "completed",
+  "artifact": {
+    "schema_version": 1,
+    "revision": "0243f603d69c777e197463febb7ded705f8c59f7",
+    "tag": "0243f603d69c777e197463febb7ded705f8c59f7",
+    "source": "https://github.com/SebaOre/Devops_Ev-1",
+    "base_commit": "0243f603d69c777e197463febb7ded705f8c59f7",
+    "working_tree_dirty": false,
+    "build_mode": "github-actions",
+    "created_at_utc": "2026-10-29T18:19:39.991239+00:00",
+    "workflow_run": {
+      "id": "40929310543",
+      "attempt": "1",
+      "event": "push"
+    },
+    "images": {
+      "usuarios": {
+        "reference": "ep2-usuarios:0243f603d69c777e197463febb7ded705f8c59f7",
+        "image_id": "sha256:8660dd8ce8c22ada95c8ca463d756ff3534c6350462ea4c033a28a0eae6e0ff0"
+      },
+      "estadisticas": {
+        "reference": "ep2-estadisticas:0243f603d69c777e197463febb7ded705f8c59f7",
+        "image_id": "sha256:fc4c19574aa5b9a27dea585d5da68c612695e95c014feae3a7ec38d8a518d32c"
+      }
+    },
+    "archive": {
+      "file": "images.tar.gz",
+      "sha256": "bfe07c0a502f89b4015a9f24e450cc04c527a09dd06e02cf42f2a32b619b04c9",
+      "bytes": 81855582
+    }
+  },
+  "gateway_image": "nginx:1.30.6-alpine@sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949",
+  "containers": {
+    "usuarios": {
+      "id": "6d49a5c3c1913e48cd6c2fdc5aceceee36487e0cfb7b381b538c7b4c1ffbba17",
+      "runtime_image_id": "sha256:8660dd8ce8c22ada95c8ca463d756ff3534c6350462ea4c033a28a0eae6e0ff0",
+      "image_reference": "ep2-usuarios:0243f603d69c777e197463febb7ded705f8c59f7",
+      "health": "healthy"
+    },
+    "estadisticas": {
+      "id": "1500019110d7b64e1a658317957b4eb4831e3af0b43b0ed8af4a61bf66b5aa08",
+      "runtime_image_id": "sha256:fc4c19574aa5b9a27dea585d5da68c612695e95c014feae3a7ec38d8a518d32c",
+      "image_reference": "ep2-estadisticas:0243f603d69c777e197463febb7ded705f8c59f7",
+      "health": "healthy"
+    },
+    "gateway": {
+      "id": "42257c9be9ee0104177ca5c01e3182f3a20a9245f428ddb02a49b5b1ba4f21cb",
+      "runtime_image_id": "sha256:88f52f3d58a505b7e1ad96ca6969478517bcccb58418e75a54223271a64da7df",
+      "image_reference": "nginx:1.30.6-alpine@sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949",
+      "health": "healthy"
+    }
+  },
+  "temporary_url": "http://127.0.0.1:32768",
+  "checks": [
+    "frontend, salud y resumen inicial",
+    "creacion, consulta y comunicacion HTTP entre microservicios",
+    "actualizacion reflejada en estadisticas",
+    "persistencia y recuperacion al recrear usuarios",
+    "eliminacion y resumen final"
+  ],
+  "recreated_users_container_id": "892e6c9634edc23b0393c95c8a94b33c5a74519d32d887477727f411c017d217",
+  "recreated_users_runtime_image_id": "sha256:8660dd8ce8c22ada95c8ca463d756ff3534c6350462ea4c033a28a0eae6e0ff0",
+  "cleanup": {
+    "completed": true,
+    "remaining": {
+      "container": [],
+      "volume": [],
+      "network": []
+    }
+  },
+  "finished_at_utc": "2026-10-29T18:21:29.687621+00:00"
+}

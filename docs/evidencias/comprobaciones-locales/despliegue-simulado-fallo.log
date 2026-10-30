@@ -1,0 +1,14 @@
+usuarios-1      | 2026-10-29T18:14:39.581876972Z INFO:     Started server process [7]
+estadisticas-1  | 2026-10-29T18:14:56.054240797Z INFO:     Started server process [7]
+estadisticas-1  | 2026-10-29T18:14:56.054296211Z INFO:     Waiting for application startup.
+estadisticas-1  | 2026-10-29T18:14:56.055110628Z INFO:     Application startup complete.
+usuarios-1      | 2026-10-29T18:14:39.581957971Z INFO:     Waiting for application startup.
+usuarios-1      | 2026-10-29T18:14:39.623461204Z INFO:     Application startup complete.
+estadisticas-1  | 2026-10-29T18:14:56.055662274Z INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+estadisticas-1  | 2026-10-29T18:15:01.348834884Z INFO:     127.0.0.1:56922 - "GET /health HTTP/1.1" 200 OK
+estadisticas-1  | 2026-10-29T18:15:07.341825822Z INFO:     127.0.0.1:56950 - "GET /health HTTP/1.1" 200 OK
+usuarios-1      | 2026-10-29T18:14:39.624067998Z INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+usuarios-1      | 2026-10-29T18:14:45.462666307Z INFO:     127.0.0.1:56770 - "GET /health HTTP/1.1" 200 OK
+usuarios-1      | 2026-10-29T18:14:52.865144412Z INFO:     127.0.0.1:50642 - "GET /health HTTP/1.1" 200 OK
+usuarios-1      | 2026-10-29T18:14:58.968781873Z INFO:     127.0.0.1:46908 - "GET /health HTTP/1.1" 200 OK
+usuarios-1      | 2026-10-29T18:15:05.889844922Z INFO:     127.0.0.1:46924 - "GET /health HTTP/1.1" 200 OK

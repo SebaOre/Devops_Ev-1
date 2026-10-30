@@ -11,3 +11,4 @@ reports/
 .sonar-local/
 .scannerwork/
 artifacts/
+tmp/

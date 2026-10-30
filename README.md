@@ -1,147 +1,133 @@
-## Evidencias del trabajo colaborativo
+# Evaluación Parcial 2 - Ingeniería DevOps
 
-Durante el desarrollo se realizaron los siguientes cambios mediante ramas y Pull Requests:
+Proyecto de **DOY0101**: dos microservicios Python, contenedores, pruebas,
+análisis de seguridad y despliegue automático simulado con GitHub Actions y
+Docker Compose.
 
-- Feature 1: desarrollo de una primera funcionalidad mediante una rama `feature/*`.
-- Feature 2: incorporacion de una seccion de genero mediante la rama `feature/Segundo-cambio`.
-- Feature 3: incorporacion del endpoint `/info` mediante la rama `feature/tercer-cambio`.
-- Hotfix: correccion del endpoint `/health` mediante la rama `hotfix/correccion-health`.
-- Sincronizacion de `main` hacia `develop`, resolviendo un conflicto de integracion en `backend/app/main.py`.
-- Pull Requests utilizados para revision y posterior integracion de cambios.
+Integrantes confirmados: [SebaOre](https://github.com/SebaOre) y
+[MoixesMasc](https://github.com/MoixesMasc). Ver [identificación y aportes](docs/EQUIPO.md).
+**Estado:** pasos 1 a 8 verificados; documentación técnica del paso 9 preparada.
+Quedan los textos de autoría del equipo y la revisión de entrega.
+Ver [PROGRESO_EP2.md](docs/PROGRESO_EP2.md).
 
-## Modelo de ramificacion utilizado
+## Aplicación y arquitectura
 
-## ¿Que es un modelo de ramificacion?
+| Componente | Función | Puerto interno | Persistencia |
+| --- | --- | --- | --- |
+| Usuarios | CRUD de usuarios y frontend. | 8000 | SQLite en `/data`, volumen `usuarios_data`. |
+| Estadísticas | Consulta HTTP a usuarios y resumen por dominios de correo. | 8001 | Sin estado. |
+| Nginx | Entrada HTTP, rutas y balanceo de estadísticas. | 8080 | Configuración en solo lectura. |
 
-Un modelo de ramificacion define la forma en que un equipo organiza y administra las diferentes versiones del código dentro de un repositorio Git.
+```mermaid
+flowchart LR
+    B[Navegador: localhost:18080] --> G[Nginx]
+    G -->|Interfaz y API| U[Usuarios]
+    G -->|/stats| E[Estadísticas: 1 o más réplicas]
+    E -->|HTTP interno| U
+    U --> D[(Volumen SQLite)]
+```
 
-Las ramas permiten que diferentes desarrolladores trabajen en funcionalidades o correcciones de manera independiente, evitando modificar directamente una version estable mientras se realizan cambios.
+Los servicios Python tienen Dockerfile independientes. Compose define redes,
+volumen, dependencias de salud, límites y ejecución sin privilegios. Solo Nginx
+publica un puerto del equipo.
 
-En un proyecto colaborativo, el modelo de ramificacion establece:
+## Inicio local
 
-- Queramas existen.
-- Para que se utiliza cada rama.
-- Desde que  rama se crean nuevas ramas.
-- Hacia que rama se integran los cambios.
-- Como se revisan los cambios.
-- Como se incorporan nuevas funcionalidades.
-- Como se realizan correcciones urgentes.
+Requisitos: Docker Desktop con motor Linux, Docker Compose y Python 3.11 o
+posterior para los scripts. Desde la raíz del repositorio:
 
-## Modelo de ramificacion considerado
+```powershell
+python scripts/iniciar_compose.py
+docker compose ps
+```
 
-### GitFlow
+El lanzador construye ambas imágenes y espera su salud. En Windows usa
+`docker build` seguido de Compose para evitar el fallo de Bake observado con
+los caracteres de esta ruta. No requiere crear `.env`.
 
-GitFlow organiza el desarrollo mediante diferentes tipos de ramas, cada una con un proposito definido.
+| Dirección | Contenido |
+| --- | --- |
+| [localhost:18080](http://localhost:18080/) | Interfaz de usuarios. |
+| [Usuarios](http://localhost:18080/users/) | API de usuarios. |
+| [Swagger](http://localhost:18080/docs) | Operaciones de usuarios. |
+| [Estadísticas](http://localhost:18080/stats) | Resumen por dominio. |
+| [Salud](http://localhost:18080/health) | Salud de usuarios. |
 
-Las ramas principales son:
+Escalar estadísticas y detener conservando los datos:
 
-- `main`: contiene las versiones estables.
-- `develop`: concentra la integración del desarrollo.
-- `feature/*`: permite desarrollar nuevas funcionalidades.
-- `hotfix/*`: permite realizar correcciones sobre versiones estables.
+```powershell
+docker compose up -d --scale estadisticas=3 --wait
+docker compose down
+```
 
-Su estructura permite separar claramente el desarrollo de nuevas funcionalidades de las versiones consideradas estables.
+Ver [COMPOSE.md](docs/COMPOSE.md) para puertos, recursos, persistencia y escalado.
 
+## Pipeline CI/CD
 
-## Integración continua con GitHub Actions
+[CI.yml](.github/workflows/CI.yml) se activa con pushes a `main`, `develop`,
+`feature/**` y `codex/**`, Pull Requests hacia `main` o `develop`, y ejecución
+manual. Utiliza Ubuntu 24.04 y Python 3.11.
 
-El proyecto incorpora un workflow ubicado en:
+| Job | Operaciones y aprobación |
+| --- | --- |
+| `validate` | Sintaxis, PyTest, cobertura mínima del 90% y tres auditorías de dependencias con `pip-audit`. |
+| `sonar` | Necesita `validate`; recupera cobertura y exige Quality Gate: seguridad A y cobertura mínima del 90%. |
+| `build` | Necesita pruebas y SonarQube; construye, etiqueta por SHA, empaqueta y verifica ambas imágenes. |
+| `deploy` | Necesita las etapas anteriores; carga ese paquete en otro runner, despliega Compose, prueba APIs y persistencia, guarda evidencia y retira el entorno. |
 
-`.github/workflows/CI.yml`
+Los fallos bloquean las etapas dependientes y generan anotaciones de error.
+No se utiliza `continue-on-error`. La simulación vive en el runner durante la
+verificación; su URL local no permanece publicada después de la limpieza.
 
-El workflow se ejecuta automaticamente en:
+## Trazabilidad y calidad
 
-- Cada `push` hacia `develop`.
-- Cada Pull Request dirigido hacia `main`.
+La [ejecución completa aprobada del 29 de octubre de 2026](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543)
+corresponde al commit `0243f603d69c777e197463febb7ded705f8c59f7`:
 
-Las validaciones realizadas son:
+- **57 pruebas aprobadas**, cobertura de servicios de **99,60%**.
+- Auditorías de usuarios, estadísticas y entorno sin vulnerabilidades conocidas.
+- SonarQube: gate `OK`, seguridad A, cero observaciones y hotspots.
+- Las mismas imágenes construidas se cargaron y ejecutaron en el despliegue.
+- CRUD, comunicación HTTP, persistencia y limpieza aprobados.
 
-1. Descarga del repositorio.
-2. Configuracion de Python 3.11.
-3. Instalacion de dependencias.
-4. Validacion de sintaxis Python mediante `compileall`.
-5. Verificacion de la estructura básica del proyecto.
+Las etiquetas OCI registran revisión y repositorio. El manifiesto conserva
+referencias, identificadores, checksum SHA-256 y ejecución de origen. El
+despliegue comprueba esos datos antes de iniciar Compose. Los artefactos de
+Actions se conservan siete días; una copia revisada de los reportes está en
+[EVIDENCIAS.md](docs/EVIDENCIAS.md).
 
-El resultado exitoso de estas validaciones permite comprobar automaticamente que los cambios mantienen una estructura y sintaxis valida antes de continuar con el flujo de integración.
+La suite usa SQLite en memoria y HTTP simulado; Docker y el despliegue se prueban
+además con contenedores reales. La cobertura publicada mide Python y no las
+líneas del frontend JavaScript.
 
-## Entorno Cloud simulado
+## Pruebas locales
 
-Para esta evaluacion se utilizo GitHub como plataforma colaborativa y GitHub Actions como entorno de ejecucion automatizada en la nube.
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-test.txt -r requirements-security.txt
+.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe scripts/auditar_dependencias.py
+```
 
-El flujo implementado es:
+[Dependabot](.github/dependabot.yml) está configurado. Su integración en la rama
+predeterminada y la protección de ramas siguen pendientes de la revisión final;
+`needs` ya bloquea las etapas del pipeline ante fallos.
 
-Git - GitHub - Pull Request / Push - GitHub Actions - Validaciones automaticas - Resultado de ejecucion
+## Documentación y entrega
 
-No se realizo un despliegue hacia infraestructura productiva, ya que la evaluacion solicita un entorno Cloud simulado.
+| Documento | Contenido |
+| --- | --- |
+| [Docker](docs/DOCKER.md) / [Compose](docs/COMPOSE.md) | Construcción, redes, persistencia, límites y escalado. |
+| [Pruebas](docs/PRUEBAS.md) / [Seguridad](docs/SEGURIDAD.md) | Casos, cobertura, auditorías, SonarQube y bloqueos. |
+| [Pipeline](docs/PIPELINE.md) / [Despliegue](docs/DESPLIEGUE.md) | Orden, artefactos, identidad y simulación. |
+| [Evidencias](docs/EVIDENCIAS.md) | Relación con IE1-IE5 y resultados conservados. |
+| [Uso de IA](docs/USO_IA.md) | Herramienta, alcance real y referencias. |
+| [Equipo](docs/EQUIPO.md) | Identificación y aportes pendientes de completar. |
+| [Justificaciones](docs/JUSTIFICACIONES_EQUIPO.md) | Sección reservada a la autoría del equipo. |
+| [Conclusiones](docs/CONCLUSIONES.md) | Secciones personales sin respuestas generadas por IA. |
+| [Entrega](docs/ENTREGA_EP2.md) | Comprobaciones y pendientes antes de entregar. |
 
-## Buenas practicas utilizadas
-
-- Uso de ramas separadas para funcionalidades y correcciones.
-- Uso de Pull Requests para integrar cambios.
-- Revision de cambios antes del merge.
-- Mensajes de commit descriptivos.
-- Separacion entre `main` y `develop`.
-- Uso de nombres de ramas descriptivos.
-- Validacion automoatica mediante GitHub Actions.
-- Resolucion documentada de conflictos de integracion.
-- No almacenar credenciales o informacion sensible en el repositorio.
-
-## Reflexiones
-
-En esta evaluacion aprendimos como trabajar colaborativamente entre desarrolladores utilizando diferentes modelos de ramificacion. El modelo escogido por nuestro grupo fue GitFlow, el cual nos ayudo a entender como separar las ramas y que funcion cumple cada una dentro del proyecto.
-
-Tambien aprendimos como crear y trabajar con Pull Requests, realizar revisiones y posteriormente hacer el merge de los cambios para integrarlos al proyecto principal. Esto nos permitio comprender mejor como se puede trabajar en equipo sin modificar directamente la rama principal.
-
-Otro aprendizaje importante fue conocer los archivos YML y su utilizacion para la automatizacion. En nuestro caso, utilizamos GitHub Actions para crear un flujo que permitiera validar automaticamente el proyecto. Pudimos comprobar que las validaciones se ejecutaran correctamente tanto al realizar cambios en develop como mediante un Pull Request hacia main.
-
-Finalmente, vimos la importancia de utilizar buenas practicas en un proyecto, como mantener una estructura ordenada, utilizar nombres adecuados para las ramas y commits, y dejar documentado el trabajo realizado. Esto nos permitio comprender que DevOps no solamente consiste en programar, sino tambien en organizar, colaborar y automatizar parte del proceso de desarrollo.
-
-## Uso de Inteligencia Artificial
-
-Durante el desarrollo del proyecto se utilizaron herramientas de Inteligencia Artificial como apoyo para:
-
-- Revisar y mejorar la redaccion de documentacion.
-- Comprender conceptos relacionados con Git, GitFlow y CI/CD.
-- Apoyar la identificacion de errores durante el desarrollo.
-- Organizar la documentacion tecnica del proyecto.
-
-
-Los integrantes pueden trabajar en ramas independientes sin modificar
-directamente la versión estable.
-
-### Recuperación
-
-Si una modificación genera un problema, Git permite revisar el historial
-y recuperar una versión anterior.
-
-### Integración controlada
-
-Los cambios no tienen que incorporarse inmediatamente a la rama principal.
-Pueden ser revisados antes de realizar el merge.
-
-# 6. Modelos de ramificación
-
-Existen diferentes estrategias para organizar el trabajo mediante ramas.
-
-En este proyecto se consideran tres modelos principales:
-
-1. GitFlow.
-2. GitHub Flow.
-3. Trunk-Based Development.
-
-# 7. GitFlow
-
-GitFlow organiza el desarrollo utilizando diferentes tipos de ramas según
-la función que cumplen dentro del proyecto.
-
-La estructura utilizada en este proyecto es:
-
-```text
-main
-develop
-feature/<nombre>
-hotfix/<nombre>
-
-## Prueba de integración CI/CD
-
-Esta modificación se utiliza para verificar la ejecución automática del workflow de GitHub Actions mediante un Pull Request.
+La documentación descriptiva contó con asistencia de IA y requiere revisión
+del equipo. Las conclusiones, justificaciones técnicas y reflexiones deben
+completarse con autoría de los estudiantes, según la pauta.
+El README anterior se conserva en [EA1_README_ORIGINAL.md](docs/EA1_README_ORIGINAL.md).

@@ -276,9 +276,27 @@ retencion de siete dias.
 
 Los comandos, limites y evidencias se describen en [DESPLIEGUE.md](DESPLIEGUE.md).
 
-## Documentacion pendiente para la entrega
+## Avance del paso 9/10
 
-Registrar evidencias de ejecucion real, aportes de cada integrante y herramientas
-de IA utilizadas con sus usos y referencias. Cada integrante debe escribir su
-reflexion personal segun las condiciones de la pauta. Aun falta incorporar esas
-reflexiones y los demas documentos finales.
+El 30 de octubre de 2026 se actualizo el README para describir EP2 y se conservo
+su version anterior en `docs/EA1_README_ORIGINAL.md`. Se incorporaron el indice
+de evidencias por IE1-IE5, la declaracion del alcance real de IA y el registro de
+preparacion de entrega. Se conservaron doce reportes remotos con checksums y
+tres evidencias locales, sin el paquete binario de imagenes ni credenciales.
+
+El usuario confirmo las cuentas SebaOre y MoixesMasc. Tambien indico que los
+integrantes completaran directamente los archivos de aportes, justificaciones,
+conclusiones y reflexiones. Esos textos no se generan con IA. La documentacion
+descriptiva queda pendiente de revision por el equipo.
+
+Se verificaron enlaces locales, bloques de codigo, formatos de evidencia y
+los doce checksums. El JUnit conservado registra 57 pruebas sin fallos ni errores.
+Este paso permanece abierto hasta incorporar los textos propios del equipo.
+
+## Avance del paso 10/10
+
+La revision remota confirmo que `main` es la rama predeterminada, el repositorio
+es publico y esa rama aun no tiene proteccion. Las actualizaciones de seguridad
+de Dependabot estaban deshabilitadas al consultar los ajustes. La configuracion
+de EP2 sigue en `feature/evaluacion-2`; su integracion y activacion quedan
+pendientes de la revision final. Los detalles estan en `docs/ENTREGA_EP2.md`.
