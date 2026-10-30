@@ -1,0 +1,40 @@
+{
+  "checked_at_utc": "2026-10-30T13:46:19.017340+00:00",
+  "local_environment": true,
+  "http": {
+    "/": 200,
+    "/health": 200,
+    "/stats": 200
+  },
+  "containers": {
+    "usuarios": {
+      "id": "a5c23ea84bd588d71056f6423ec5b737778e5cb78b64cb9d7f5c4074d861049f",
+      "health": "healthy",
+      "image_reference": "ep2-usuarios:local",
+      "uid": "10001:10001",
+      "packaging_versions": {
+        "pip": "26.2.2",
+        "setuptools": "84.1.0"
+      },
+      "pip_check_exit_code": 0,
+      "data_volume": "devops-ep2_usuarios_data"
+    },
+    "estadisticas": {
+      "id": "1a17b39ab9d2c4e678cfc11e1b05541749b26b95c0d27383ac09250985b30169",
+      "health": "healthy",
+      "image_reference": "ep2-estadisticas:local",
+      "uid": "10001:10001",
+      "packaging_versions": {
+        "pip": "26.2.2",
+        "setuptools": "84.1.0"
+      },
+      "pip_check_exit_code": 0
+    },
+    "gateway": {
+      "id": "ffcc74dd2b1263e581d3d297ecf8d6dace29e706f7c75668c7aec19e49802735",
+      "health": "healthy",
+      "image_reference": "nginx:1.30.6-alpine@sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949",
+      "uid": "101:101"
+    }
+  }
+}

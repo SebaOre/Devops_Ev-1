@@ -1,0 +1,73 @@
+{
+  "project": "ep2-deploy-bd6bde074d3e",
+  "revision": "working-tree",
+  "status": "failed",
+  "started_at_utc": "2026-10-29T18:14:08.717145+00:00",
+  "simulation": true,
+  "intentional_failure": true,
+  "workflow_run_id": null,
+  "workflow_run_attempt": null,
+  "stage": "startup",
+  "artifact": {
+    "schema_version": 1,
+    "revision": "working-tree",
+    "tag": "local-49e9735dae20",
+    "source": "https://github.com/SebaOre/Devops_Ev-1",
+    "base_commit": "e86b199bf68e1962a0ccef9084c819bf317da253",
+    "working_tree_dirty": true,
+    "build_mode": "local-verification",
+    "created_at_utc": "2026-10-29T17:11:20.268076+00:00",
+    "workflow_run": {
+      "id": null,
+      "attempt": null,
+      "event": null
+    },
+    "images": {
+      "usuarios": {
+        "reference": "ep2-usuarios:local-49e9735dae20",
+        "image_id": "sha256:c7b6bee593e7bf15dedc71a25b7779e04f436c662c6f317c8e45746dcc248192"
+      },
+      "estadisticas": {
+        "reference": "ep2-estadisticas:local-49e9735dae20",
+        "image_id": "sha256:b577f71abad01e1a4c4e9a1c54d9029f9346c56b6db33999dc66e264a67e53ea"
+      }
+    },
+    "archive": {
+      "file": "images.tar.gz",
+      "sha256": "a6aa1cd121ecbb7f8b9716506f48130a859200f2caacc4662c628da01e411ce6",
+      "bytes": 78792551
+    }
+  },
+  "gateway_image": "nginx:1.30.6-alpine@sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949",
+  "containers": {
+    "usuarios": {
+      "id": "bc5d6cb9e028cfa8084abc873f586254bc13b43ea33073e5b68014103abe8c67",
+      "runtime_image_id": "sha256:c7b6bee593e7bf15dedc71a25b7779e04f436c662c6f317c8e45746dcc248192",
+      "image_reference": "ep2-usuarios:local-49e9735dae20",
+      "health": "healthy"
+    },
+    "estadisticas": {
+      "id": "2cf5d0daf388645d5119bc0fa77a51856f75cd1ecfcbca3d487d34f4425a4be8",
+      "runtime_image_id": "sha256:b577f71abad01e1a4c4e9a1c54d9029f9346c56b6db33999dc66e264a67e53ea",
+      "image_reference": "ep2-estadisticas:local-49e9735dae20",
+      "health": "healthy"
+    },
+    "gateway": {
+      "id": "5fa43d16900d9483664c27960dcbe4876bb828ee5aacd5c3addea3fe3a1b253a",
+      "runtime_image_id": "sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949",
+      "image_reference": "nginx:1.30.6-alpine@sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949",
+      "health": "healthy"
+    }
+  },
+  "temporary_url": "http://127.0.0.1:32775",
+  "error": "Fallo intencional para verificar diagnostico y limpieza",
+  "cleanup": {
+    "completed": true,
+    "remaining": {
+      "container": [],
+      "volume": [],
+      "network": []
+    }
+  },
+  "finished_at_utc": "2026-10-29T18:15:15.351710+00:00"
+}

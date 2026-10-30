@@ -1,0 +1,37 @@
+gateway-1       | 2026-10-29T18:21:22.402035698Z GET / status=200 upstream=172.18.0.2:8000
+gateway-1       | 2026-10-29T18:21:22.404508808Z GET /health status=200 upstream=172.18.0.2:8000
+gateway-1       | 2026-10-29T18:21:22.410017186Z GET /users/ status=200 upstream=172.18.0.2:8000
+gateway-1       | 2026-10-29T18:21:22.425246330Z GET /stats status=200 upstream=172.18.0.3:8001
+gateway-1       | 2026-10-29T18:21:22.434456454Z POST /users/ status=201 upstream=172.18.0.2:8000
+estadisticas-1  | 2026-10-29T18:21:12.342696401Z INFO:     Started server process [7]
+estadisticas-1  | 2026-10-29T18:21:12.342771530Z INFO:     Waiting for application startup.
+estadisticas-1  | 2026-10-29T18:21:12.343227680Z INFO:     Application startup complete.
+usuarios-1      | 2026-10-29T18:21:24.745934039Z INFO:     Started server process [7]
+estadisticas-1  | 2026-10-29T18:21:12.343482826Z INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+estadisticas-1  | 2026-10-29T18:21:16.345841276Z INFO:     127.0.0.1:53640 - "GET /health HTTP/1.1" 200 OK
+usuarios-1      | 2026-10-29T18:21:24.746002927Z INFO:     Waiting for application startup.
+usuarios-1      | 2026-10-29T18:21:24.747470762Z INFO:     Application startup complete.
+usuarios-1      | 2026-10-29T18:21:24.747718894Z INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+usuarios-1      | 2026-10-29T18:21:28.341461291Z INFO:     127.0.0.1:47262 - "GET /health HTTP/1.1" 200 OK
+usuarios-1      | 2026-10-29T18:21:28.410651540Z INFO:     172.18.0.3:40764 - "GET /users/?skip=0&limit=100 HTTP/1.1" 200 OK
+usuarios-1      | 2026-10-29T18:21:28.414421587Z INFO:     172.18.0.4:45876 - "GET /users/ HTTP/1.1" 200 OK
+usuarios-1      | 2026-10-29T18:21:28.420334597Z INFO:     172.18.0.4:45876 - "DELETE /users/1 HTTP/1.1" 204 No Content
+gateway-1       | 2026-10-29T18:21:22.440223125Z POST /users/ status=201 upstream=172.18.0.2:8000
+estadisticas-1  | 2026-10-29T18:21:21.757362618Z INFO:     127.0.0.1:53650 - "GET /health HTTP/1.1" 200 OK
+gateway-1       | 2026-10-29T18:21:22.443078713Z GET /users/1 status=200 upstream=172.18.0.2:8000
+estadisticas-1  | 2026-10-29T18:21:22.424944959Z INFO:     172.18.0.4:52926 - "GET /stats HTTP/1.1" 200 OK
+gateway-1       | 2026-10-29T18:21:22.447913608Z GET /stats status=200 upstream=172.18.0.3:8001
+estadisticas-1  | 2026-10-29T18:21:22.447646096Z INFO:     172.18.0.4:52926 - "GET /stats HTTP/1.1" 200 OK
+gateway-1       | 2026-10-29T18:21:22.454270513Z PUT /users/2 status=200 upstream=172.18.0.2:8000
+estadisticas-1  | 2026-10-29T18:21:22.458447844Z INFO:     172.18.0.4:52926 - "GET /stats HTTP/1.1" 200 OK
+gateway-1       | 2026-10-29T18:21:22.458731504Z GET /stats status=200 upstream=172.18.0.3:8001
+estadisticas-1  | 2026-10-29T18:21:27.152144004Z INFO:     127.0.0.1:38718 - "GET /health HTTP/1.1" 200 OK
+usuarios-1      | 2026-10-29T18:21:28.423791478Z INFO:     172.18.0.4:45876 - "DELETE /users/2 HTTP/1.1" 204 No Content
+estadisticas-1  | 2026-10-29T18:21:28.411519772Z INFO:     172.18.0.4:46898 - "GET /stats HTTP/1.1" 200 OK
+usuarios-1      | 2026-10-29T18:21:28.427189417Z INFO:     172.18.0.3:40768 - "GET /users/?skip=0&limit=100 HTTP/1.1" 200 OK
+estadisticas-1  | 2026-10-29T18:21:28.427976451Z INFO:     172.18.0.4:46898 - "GET /stats HTTP/1.1" 200 OK
+gateway-1       | 2026-10-29T18:21:28.411801497Z GET /stats status=200 upstream=172.18.0.3:8001
+gateway-1       | 2026-10-29T18:21:28.414713271Z GET /users/ status=200 upstream=172.18.0.2:8000
+gateway-1       | 2026-10-29T18:21:28.420610126Z DELETE /users/1 status=204 upstream=172.18.0.2:8000
+gateway-1       | 2026-10-29T18:21:28.423966845Z DELETE /users/2 status=204 upstream=172.18.0.2:8000
+gateway-1       | 2026-10-29T18:21:28.428272754Z GET /stats status=200 upstream=172.18.0.3:8001

@@ -1,0 +1,15 @@
+{
+  "project": "ep2-compose-check-5aa8a112bf",
+  "checked_at_utc": "2026-10-29T16:47:06.413640+00:00",
+  "stats_replicas": 3,
+  "upstreams_observed": {
+    "172.21.0.3": 6,
+    "172.21.0.5": 4,
+    "172.21.0.6": 4
+  },
+  "transient_errors_after_replica_stop": 0,
+  "persisted_after_down_up": true,
+  "dependency_failure_returns_503": true,
+  "recovers_after_users_restart": true,
+  "status": "passed"
+}

@@ -1,108 +1,243 @@
-## Evidencias del trabajo colaborativo
+# EP2 - Pipeline CI/CD de dos microservicios
 
-Durante el desarrollo se realizaron los siguientes cambios mediante ramas y Pull Requests:
+**Asignatura:** DOY0101, Ingeniería DevOps.
 
-- Feature 1: desarrollo de una primera funcionalidad mediante una rama `feature/*`.
-- Feature 2: incorporacion de una seccion de genero mediante la rama `feature/Segundo-cambio`.
-- Feature 3: incorporacion del endpoint `/info` mediante la rama `feature/tercer-cambio`.
-- Hotfix: correccion del endpoint `/health` mediante la rama `hotfix/correccion-health`.
-- Sincronizacion de `main` hacia `develop`, resolviendo un conflicto de integracion en `backend/app/main.py`.
-- Pull Requests utilizados para revision y posterior integracion de cambios.
+**Integrantes:** [SebaOre](https://github.com/SebaOre) y [MoixesMasc](https://github.com/MoixesMasc).
 
-## Modelo de ramificacion utilizado
+**Documento principal para corregir la evaluación:** este README.
 
-## ¿Que es un modelo de ramificacion?
+## Qué revisar primero
 
-Un modelo de ramificacion define la forma en que un equipo organiza y administra las diferentes versiones del código dentro de un repositorio Git.
+Estas son las tres comprobaciones principales. Cada enlace abre la evidencia
+de ejecución; los reportes también están conservados en el repositorio.
 
-Las ramas permiten que diferentes desarrolladores trabajen en funcionalidades o correcciones de manera independiente, evitando modificar directamente una version estable mientras se realizan cambios.
+| Requisito | Abrir esta evidencia | Resultado registrado |
+| --- | --- | --- |
+| Se ejecutaron las pruebas | [Job de pruebas y auditorías](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/job/123643184129) | **57 pruebas aprobadas y cobertura 99,60%.** |
+| Se analizó con SonarQube | [Job de SonarQube](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/job/123643538609) | **Quality Gate OK, seguridad A y cero observaciones.** |
+| Hay dos microservicios en Docker | [Construcción de imágenes](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/job/123644623219) y [salida real de Docker local](docs/evidencias/docker-estado-2026-10-30.txt) | **Imágenes de usuarios y estadísticas; ambos servicios saludables.** |
 
-En un proyecto colaborativo, el modelo de ramificacion establece:
+[Ver el pipeline completo aprobado](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543).
+Los resultados remotos anteriores corresponden al **29 de octubre de 2026**,
+commit `0243f603d69c777e197463febb7ded705f8c59f7`. La comprobación local de Docker
+corresponde al **30 de octubre**. Los cambios posteriores de documentación no
+se presentan como nuevas ejecuciones del código.
 
-- Queramas existen.
-- Para que se utiliza cada rama.
-- Desde que  rama se crean nuevas ramas.
-- Hacia que rama se integran los cambios.
-- Como se revisan los cambios.
-- Como se incorporan nuevas funcionalidades.
-- Como se realizan correcciones urgentes.
+<a id="docker"></a>
 
-## Modelo de ramificacion considerado
+## 1. Los dos microservicios y sus contenedores
 
-### GitFlow
+| Microservicio | Qué hace | Código y Dockerfile |
+| --- | --- | --- |
+| **Usuarios** | Crear, listar, consultar, actualizar y eliminar usuarios; sirve la interfaz web y guarda SQLite. | [Código](backend/app) · [Dockerfile](backend/Dockerfile) |
+| **Estadísticas** | Consulta usuarios por HTTP y calcula totales y dominios de correo. Tiene su propia API y no accede directamente a SQLite. | [Código](estadisticas/app) · [Dockerfile](estadisticas/Dockerfile) |
 
-GitFlow organiza el desarrollo mediante diferentes tipos de ramas, cada una con un proposito definido.
+Nginx es el proxy de entrada. Por eso Compose muestra **tres contenedores**:
+dos microservicios y el proxy.
 
-Las ramas principales son:
+| Contenedor observado el 30 de octubre | Imagen local | Salud |
+| --- | --- | --- |
+| `devops-ep2-usuarios-1` | `ep2-usuarios:local` | `healthy` |
+| `devops-ep2-estadisticas-1` | `ep2-estadisticas:local` | `healthy` |
+| `devops-ep2-gateway-1` | Nginx oficial fijado por versión y digest | `healthy` |
 
-- `main`: contiene las versiones estables.
-- `develop`: concentra la integración del desarrollo.
-- `feature/*`: permite desarrollar nuevas funcionalidades.
-- `hotfix/*`: permite realizar correcciones sobre versiones estables.
+**Cómo comprobarlo:** abrir la [salida real de `docker compose ps` y de las imágenes](docs/evidencias/docker-estado-2026-10-30.txt).
+El [reporte local](docs/evidencias/comprobaciones-locales/arranque-2026-10-30.json)
+registra también HTTP 200 en interfaz, salud y estadísticas, usuario 10001 y
+dependencias compatibles en ambos servicios Python.
 
-Su estructura permite separar claramente el desarrollo de nuevas funcionalidades de las versiones consideradas estables.
+```mermaid
+flowchart LR
+    B[Navegador: localhost:18080] --> G[Nginx]
+    G -->|Interfaz y API| U[Usuarios:8000]
+    G -->|/stats| E[Estadísticas:8001]
+    E -->|HTTP interno| U
+    U --> D[(Volumen SQLite)]
+```
 
+La [configuración Compose](compose.yaml) define redes, volumen, salud,
+dependencias, límites y ejecución sin privilegios. Solo Nginx publica el puerto
+18080. Estadísticas se puede escalar a tres réplicas; la
+[verificación de orquestación](docs/evidencias/comprobaciones-locales/compose-verificacion.json)
+registró tráfico a tres IPs, persistencia y recuperación ante fallos.
 
-## Integración continua con GitHub Actions
+<a id="pruebas"></a>
 
-El proyecto incorpora un workflow ubicado en:
+## 2. Evidencia de las pruebas automatizadas
 
-`.github/workflows/CI.yml`
+| Medición | Resultado del reporte |
+| --- | --- |
+| Casos PyTest | **57 aprobados**, sin fallos ni errores. |
+| Líneas Python cubiertas | 211 de 211, **100%**. |
+| Ramas cubiertas | 35 de 36, **97,22%**. |
+| Cobertura combinada de líneas y ramas | **99,60%**. |
+| Umbral exigido por el proyecto | **90%**. |
 
-El workflow se ejecuta automaticamente en:
+**Dónde verlo:** en el [job de pruebas](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/job/123643184129),
+expandir **Ejecutar pruebas y verificar cobertura mínima**. El respaldo está
+en el [JUnit original](docs/evidencias/run-40929310543/pytest.xml) y el
+[XML de cobertura](docs/evidencias/run-40929310543/coverage.xml).
 
-- Cada `push` hacia `develop`.
-- Cada Pull Request dirigido hacia `main`.
+La [suite](tests) cubre CRUD, validación, duplicados, paginación, fallos HTTP,
+resúmenes e integridad de artefactos. Utiliza SQLite en memoria y HTTP simulado.
+El despliegue agrega comprobaciones reales sobre contenedores. La cobertura
+anterior mide los servicios Python; no mide el frontend JavaScript.
 
-Las validaciones realizadas son:
+<a id="sonarqube"></a>
 
-1. Descarga del repositorio.
-2. Configuracion de Python 3.11.
-3. Instalacion de dependencias.
-4. Validacion de sintaxis Python mediante `compileall`.
-5. Verificacion de la estructura básica del proyecto.
+## 3. Evidencia del análisis con SonarQube
 
-El resultado exitoso de estas validaciones permite comprobar automaticamente que los cambios mantienen una estructura y sintaxis valida antes de continuar con el flujo de integración.
+| Medición | Resultado conservado |
+| --- | --- |
+| Quality Gate | **OK**. |
+| Clasificación de seguridad | **A**, valor numérico 1. |
+| Cobertura recibida por SonarQube | **99,6%**. |
+| Observaciones abiertas | **0**. |
+| Security hotspots | **0**. |
+| Salida del escáner | **0**, análisis completado. |
 
-## Entorno Cloud simulado
+**Dónde verlo:** abrir el [job de SonarQube](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/job/123643538609)
+y expandir **Analizar código y exigir aprobación del Quality Gate**. El resultado
+también se puede leer en el [reporte del gate](docs/evidencias/run-40929310543/sonarqube-quality-gate.json),
+las [observaciones](docs/evidencias/run-40929310543/sonarqube-issues.json) y los
+[hotspots](docs/evidencias/run-40929310543/sonarqube-hotspots.json).
 
-Para esta evaluacion se utilizo GitHub como plataforma colaborativa y GitHub Actions como entorno de ejecucion automatizada en la nube.
+Se analizan los servicios Python, el frontend y los Dockerfile. El pipeline
+crea una instancia temporal de SonarQube en el runner. Sus resultados quedan
+en los logs y reportes aunque esa instancia se retire al finalizar.
 
-El flujo implementado es:
+Las auditorías de dependencias también terminaron sin avisos:
+[usuarios, 23 paquetes](docs/evidencias/run-40929310543/pip-audit-usuarios.json),
+[estadísticas, 14](docs/evidencias/run-40929310543/pip-audit-estadisticas.json) y
+[entorno, 59](docs/evidencias/run-40929310543/pip-audit-entorno.json).
+El [workflow](.github/workflows/CI.yml) bloquea las etapas siguientes cuando una
+prueba, auditoría o gate falla. La
+[ejecución inicial bloqueada](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40920411784)
+registra ese comportamiento ante una dependencia vulnerable, posteriormente corregida.
 
-Git - GitHub - Pull Request / Push - GitHub Actions - Validaciones automaticas - Resultado de ejecucion
+<a id="despliegue"></a>
 
-No se realizo un despliegue hacia infraestructura productiva, ya que la evaluacion solicita un entorno Cloud simulado.
+## 4. Pipeline, despliegue y trazabilidad
 
-## Buenas practicas utilizadas
+| Orden | Job | Comprobación |
+| --- | --- | --- |
+| 1 | `validate` | Pruebas, cobertura y auditorías de dependencias. |
+| 2 | `sonar` | Análisis y aprobación de SonarQube. |
+| 3 | `build` | Construcción y verificación de ambas imágenes. |
+| 4 | `deploy` | Carga del paquete en otro runner, Compose, pruebas y limpieza. |
 
-- Uso de ramas separadas para funcionalidades y correcciones.
-- Uso de Pull Requests para integrar cambios.
-- Revision de cambios antes del merge.
-- Mensajes de commit descriptivos.
-- Separacion entre `main` y `develop`.
-- Uso de nombres de ramas descriptivos.
-- Validacion automoatica mediante GitHub Actions.
-- Resolucion documentada de conflictos de integracion.
-- No almacenar credenciales o informacion sensible en el repositorio.
+**Dónde verlo:** el [job de despliegue](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/job/123645208503)
+verificó salud, CRUD, estadísticas y persistencia al recrear usuarios. El
+[reporte de despliegue](docs/evidencias/run-40929310543/despliegue-simulado.json)
+registra estado `passed`, etapa `completed` y limpieza completa, junto a los
+[logs de los servicios](docs/evidencias/run-40929310543/despliegue-simulado.log).
 
-## Reflexiones
+Las imágenes llevan el SHA completo del commit y etiquetas OCI de revisión y
+repositorio. El manifiesto registra sus identificadores, checksum y ejecución
+de origen. El despliegue verifica esos datos y usa el paquete construido, sin
+reconstruir los servicios. La URL del runner existe durante la simulación y
+deja de estar disponible después de retirar el entorno.
 
-En esta evaluacion aprendimos como trabajar colaborativamente entre desarrolladores utilizando diferentes modelos de ramificacion. El modelo escogido por nuestro grupo fue GitFlow, el cual nos ayudo a entender como separar las ramas y que funcion cumple cada una dentro del proyecto.
+<a id="evidencias"></a>
 
-Tambien aprendimos como crear y trabajar con Pull Requests, realizar revisiones y posteriormente hacer el merge de los cambios para integrarlos al proyecto principal. Esto nos permitio comprender mejor como se puede trabajar en equipo sin modificar directamente la rama principal.
+## 5. Correspondencia con la rúbrica
 
-Otro aprendizaje importante fue conocer los archivos YML y su utilizacion para la automatizacion. En nuestro caso, utilizamos GitHub Actions para crear un flujo que permitiera validar automaticamente el proyecto. Pudimos comprobar que las validaciones se ejecutaran correctamente tanto al realizar cambios en develop como mediante un Pull Request hacia main.
+| Indicador | Implementación y evidencia principal |
+| --- | --- |
+| IE1: contenedores | Dos microservicios distintos y Dockerfile independientes; ver sección 1 y job `build`. |
+| IE2: pruebas | 57 casos aprobados y cobertura 99,60%; ver sección 2. |
+| IE3: seguridad y escalabilidad | SonarQube, auditorías, bloqueos, límites y tres réplicas comprobados. Dependabot está configurado y su activación sigue pendiente. |
+| IE4: despliegue y trazabilidad | Paquete identificado por commit, verificado y desplegado en otro runner; ver sección 4. |
+| IE5: orquestación | Compose con redes, volumen, salud, dependencias, proxy y recuperación; ver sección 1. |
 
-Finalmente, vimos la importancia de utilizar buenas practicas en un proyecto, como mantener una estructura ordenada, utilizar nombres adecuados para las ramas y commits, y dejar documentado el trabajo realizado. Esto nos permitio comprender que DevOps no solamente consiste en programar, sino tambien en organizar, colaborar y automatizar parte del proceso de desarrollo.
+Los [reportes originales](docs/evidencias/run-40929310543) se conservan en el
+repositorio porque los artefactos de Actions tienen retención de siete días.
+Sus [checksums](docs/evidencias/run-40929310543/SHA256SUMS.txt) permiten detectar
+cambios en las copias. El paquete binario de imágenes no se almacena en Git.
+El estado de Compose en `*.containers.json` conserva NDJSON, un objeto por línea.
 
-## Uso de Inteligencia Artificial
+La [revisión posterior del PR #7](https://github.com/SebaOre/Devops_Ev-1/actions/runs/41065429464)
+también aprobó sus cuatro etapas el 30 de octubre. Se conserva su
+[resumen de ejecución](docs/evidencias/revision-pr7-2026-10-30.json).
 
-Durante el desarrollo del proyecto se utilizaron herramientas de Inteligencia Artificial como apoyo para:
+## 6. Cómo ejecutar la aplicación
 
-- Revisar y mejorar la redaccion de documentacion.
-- Comprender conceptos relacionados con Git, GitFlow y CI/CD.
-- Apoyar la identificacion de errores durante el desarrollo.
-- Organizar la documentacion tecnica del proyecto.
+Con Docker Desktop en modo Linux, Compose y Python 3.11 o posterior, desde la raíz:
 
+```powershell
+python scripts/iniciar_compose.py
+docker compose ps
+```
 
+Abrir [localhost:18080](http://localhost:18080/) para la interfaz,
+[/docs](http://localhost:18080/docs) para la API de usuarios y
+[/stats](http://localhost:18080/stats) para estadísticas. Estas direcciones son
+locales al equipo donde se inicia Docker.
+
+Las instrucciones de pruebas, SonarQube, escalado, detención y resolución de
+problemas están reunidas en un solo [manual técnico](docs/MANUAL_TECNICO.md).
+
+<a id="uso-de-ia"></a>
+
+## 7. Uso de inteligencia artificial
+
+Se utilizó **Codex de OpenAI** los días 29 y 30 de octubre de 2026. La asistencia
+incluyó revisión de requisitos, generación y modificación de código, pruebas,
+Dockerfile, Compose, GitHub Actions, scripts, diagramas y documentación descriptiva.
+También incluyó ejecución de herramientas e interpretación de sus resultados.
+Las firmas de Git identifican la cuenta utilizada y no distinguen por sí solas
+trabajo manual y asistencia.
+
+Este alcance incluye código y configuración. Los integrantes deben revisar con
+el docente su admisibilidad conforme a la pauta. La revisión del contenido por
+el equipo sigue pendiente. Las justificaciones, conclusiones y reflexiones
+personales quedan reservadas a la redacción de los estudiantes sin IA en el
+[archivo del equipo](docs/APORTES_Y_CONCLUSIONES.md).
+
+Referencia de la herramienta: OpenAI, **Codex**, aplicación de escritorio,
+conversación de apoyo a EP2 DOY0101, 29-30 de octubre de 2026,
+[página del producto](https://openai.com/codex/). La conversación original y los
+cambios del repositorio registran la asistencia; no se generó un enlace público
+de la conversación. Guía de citación indicada por la pauta:
+[Bibliotecas Duoc UC, Inteligencia Artificial](https://bibliotecas.duoc.cl/ia).
+El equipo debe adecuar el formato de la referencia a la indicación del docente.
+
+<a id="como-entregar"></a>
+
+## 8. Cómo entregar este trabajo
+
+**La entrega se realiza con un enlace de GitHub.** El profesor abre el README,
+revisa las tres evidencias de la primera tabla y consulta el manual si necesita
+reproducir la aplicación. Los JSON, XML y logs quedan como respaldo.
+
+El [enlace actual de EP2](https://github.com/SebaOre/Devops_Ev-1/tree/feature/evaluacion-2)
+abre esta versión del trabajo. El enlace general del repositorio abre `main`,
+que todavía contiene la versión anterior. La integración se prepara en el
+[PR #7](https://github.com/SebaOre/Devops_Ev-1/pull/7).
+
+Una vez completada y revisada la entrega, integrar el PR en `main`, comprobar
+Dependabot y usar [el enlace del repositorio](https://github.com/SebaOre/Devops_Ev-1)
+en AVA y en el correo al docente, dentro del plazo establecido. No se ha
+realizado ese envío desde esta conversación.
+
+Texto breve para acompañar el enlace, una vez completados los pendientes:
+
+> Profesor/a: compartimos el repositorio de la Evaluación Parcial 2 de DOY0101.
+> El README reúne los dos microservicios Docker y los enlaces a las ejecuciones
+> de pruebas, SonarQube y despliegue. También incluye los reportes de respaldo
+> y las instrucciones para ejecutar la aplicación. Integrantes: [nombres].
+
+<a id="pendientes-de-entrega"></a>
+
+### Pendientes antes del envío final
+
+- Completar nombres, aportes, justificaciones, conclusiones y reflexiones en
+  **un solo archivo:** [APORTES_Y_CONCLUSIONES.md](docs/APORTES_Y_CONCLUSIONES.md).
+- Validar en equipo el contenido descriptivo y revisar el alcance de IA con el docente.
+- Integrar la versión final en `main`, activar/comprobar Dependabot y revisar
+  los ajustes de seguridad y checks exigidos.
+- Comprobar la revisión final y enviar el enlace por AVA y correo.
+
+**Progreso:** pasos 1-8 verificados; 9 y 10 siguen pendientes de los textos del
+equipo, la revisión y la integración definitiva. Los registros históricos se
+conservan en Git; el informe de entrega es este README.

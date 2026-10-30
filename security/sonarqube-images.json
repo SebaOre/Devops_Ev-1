@@ -1,0 +1,4 @@
+{
+  "server": "sonarqube:community@sha256:aa0d41212704d1ed35f7ae3b49886b39f639590baf8020cdb191c2a2eb8f9eae",
+  "scanner": "sonarsource/sonar-scanner-cli:latest@sha256:47956b669bf486bdad919e1cbd0533223515aa0b6d1d31763e5a3754942df6d7"
+}
