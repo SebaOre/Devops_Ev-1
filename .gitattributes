@@ -1,2 +1,5 @@
-# Conservar los bytes de las evidencias para verificar sus checksums en cualquier SO.
-docs/evidencias/** -text
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Conservar los bytes originales de las evidencias, incluyendo finales CRLF.
+docs/evidencias/** -text whitespace=cr-at-eol
