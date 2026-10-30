@@ -1,0 +1,12 @@
+EVIDENCIA LOCAL DE DOCKER
+Fecha UTC: 2026-10-30T14:13:26.269480+00:00
+
+> docker compose ps --format "table {{.Name}}	{{.Service}}	{{.Image}}	{{.Status}}"
+NAME                        SERVICE        IMAGE                                                                                         STATUS
+devops-ep2-estadisticas-1   estadisticas   ep2-estadisticas:local                                                                        Up 30 minutes (healthy)
+devops-ep2-gateway-1        gateway        nginx:1.30.6-alpine@sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949   Up 21 hours (healthy)
+devops-ep2-usuarios-1       usuarios       ep2-usuarios:local                                                                            Up 30 minutes (healthy)
+
+> docker image inspect ep2-usuarios:local ep2-estadisticas:local --format "{{.RepoTags}} | {{.Id}} | usuario={{.Config.User}}"
+[ep2-usuarios:local] | sha256:a5614bd8139f485464a1fe2de2c77d43215445819e3246ba1b94eb8851697955 | usuario=10001:10001
+[ep2-estadisticas:local] | sha256:73eb8f22e871cff3976aabac4ec8c4b52d3960b9a715c217c07f8ed5f2ea405b | usuario=10001:10001

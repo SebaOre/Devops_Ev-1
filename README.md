@@ -1,133 +1,243 @@
-# Evaluación Parcial 2 - Ingeniería DevOps
+# EP2 - Pipeline CI/CD de dos microservicios
 
-Proyecto de **DOY0101**: dos microservicios Python, contenedores, pruebas,
-análisis de seguridad y despliegue automático simulado con GitHub Actions y
-Docker Compose.
+**Asignatura:** DOY0101, Ingeniería DevOps.
 
-Integrantes confirmados: [SebaOre](https://github.com/SebaOre) y
-[MoixesMasc](https://github.com/MoixesMasc). Ver [identificación y aportes](docs/EQUIPO.md).
-**Estado:** pasos 1 a 8 verificados; documentación técnica del paso 9 preparada.
-Quedan los textos de autoría del equipo y la revisión de entrega.
-Ver [PROGRESO_EP2.md](docs/PROGRESO_EP2.md).
+**Integrantes:** [SebaOre](https://github.com/SebaOre) y [MoixesMasc](https://github.com/MoixesMasc).
 
-## Aplicación y arquitectura
+**Documento principal para corregir la evaluación:** este README.
 
-| Componente | Función | Puerto interno | Persistencia |
-| --- | --- | --- | --- |
-| Usuarios | CRUD de usuarios y frontend. | 8000 | SQLite en `/data`, volumen `usuarios_data`. |
-| Estadísticas | Consulta HTTP a usuarios y resumen por dominios de correo. | 8001 | Sin estado. |
-| Nginx | Entrada HTTP, rutas y balanceo de estadísticas. | 8080 | Configuración en solo lectura. |
+## Qué revisar primero
+
+Estas son las tres comprobaciones principales. Cada enlace abre la evidencia
+de ejecución; los reportes también están conservados en el repositorio.
+
+| Requisito | Abrir esta evidencia | Resultado registrado |
+| --- | --- | --- |
+| Se ejecutaron las pruebas | [Job de pruebas y auditorías](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/job/123643184129) | **57 pruebas aprobadas y cobertura 99,60%.** |
+| Se analizó con SonarQube | [Job de SonarQube](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/job/123643538609) | **Quality Gate OK, seguridad A y cero observaciones.** |
+| Hay dos microservicios en Docker | [Construcción de imágenes](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/job/123644623219) y [salida real de Docker local](docs/evidencias/docker-estado-2026-10-30.txt) | **Imágenes de usuarios y estadísticas; ambos servicios saludables.** |
+
+[Ver el pipeline completo aprobado](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543).
+Los resultados remotos anteriores corresponden al **29 de octubre de 2026**,
+commit `0243f603d69c777e197463febb7ded705f8c59f7`. La comprobación local de Docker
+corresponde al **30 de octubre**. Los cambios posteriores de documentación no
+se presentan como nuevas ejecuciones del código.
+
+<a id="docker"></a>
+
+## 1. Los dos microservicios y sus contenedores
+
+| Microservicio | Qué hace | Código y Dockerfile |
+| --- | --- | --- |
+| **Usuarios** | Crear, listar, consultar, actualizar y eliminar usuarios; sirve la interfaz web y guarda SQLite. | [Código](backend/app) · [Dockerfile](backend/Dockerfile) |
+| **Estadísticas** | Consulta usuarios por HTTP y calcula totales y dominios de correo. Tiene su propia API y no accede directamente a SQLite. | [Código](estadisticas/app) · [Dockerfile](estadisticas/Dockerfile) |
+
+Nginx es el proxy de entrada. Por eso Compose muestra **tres contenedores**:
+dos microservicios y el proxy.
+
+| Contenedor observado el 30 de octubre | Imagen local | Salud |
+| --- | --- | --- |
+| `devops-ep2-usuarios-1` | `ep2-usuarios:local` | `healthy` |
+| `devops-ep2-estadisticas-1` | `ep2-estadisticas:local` | `healthy` |
+| `devops-ep2-gateway-1` | Nginx oficial fijado por versión y digest | `healthy` |
+
+**Cómo comprobarlo:** abrir la [salida real de `docker compose ps` y de las imágenes](docs/evidencias/docker-estado-2026-10-30.txt).
+El [reporte local](docs/evidencias/comprobaciones-locales/arranque-2026-10-30.json)
+registra también HTTP 200 en interfaz, salud y estadísticas, usuario 10001 y
+dependencias compatibles en ambos servicios Python.
 
 ```mermaid
 flowchart LR
     B[Navegador: localhost:18080] --> G[Nginx]
-    G -->|Interfaz y API| U[Usuarios]
-    G -->|/stats| E[Estadísticas: 1 o más réplicas]
+    G -->|Interfaz y API| U[Usuarios:8000]
+    G -->|/stats| E[Estadísticas:8001]
     E -->|HTTP interno| U
     U --> D[(Volumen SQLite)]
 ```
 
-Los servicios Python tienen Dockerfile independientes. Compose define redes,
-volumen, dependencias de salud, límites y ejecución sin privilegios. Solo Nginx
-publica un puerto del equipo.
+La [configuración Compose](compose.yaml) define redes, volumen, salud,
+dependencias, límites y ejecución sin privilegios. Solo Nginx publica el puerto
+18080. Estadísticas se puede escalar a tres réplicas; la
+[verificación de orquestación](docs/evidencias/comprobaciones-locales/compose-verificacion.json)
+registró tráfico a tres IPs, persistencia y recuperación ante fallos.
 
-## Inicio local
+<a id="pruebas"></a>
 
-Requisitos: Docker Desktop con motor Linux, Docker Compose y Python 3.11 o
-posterior para los scripts. Desde la raíz del repositorio:
+## 2. Evidencia de las pruebas automatizadas
+
+| Medición | Resultado del reporte |
+| --- | --- |
+| Casos PyTest | **57 aprobados**, sin fallos ni errores. |
+| Líneas Python cubiertas | 211 de 211, **100%**. |
+| Ramas cubiertas | 35 de 36, **97,22%**. |
+| Cobertura combinada de líneas y ramas | **99,60%**. |
+| Umbral exigido por el proyecto | **90%**. |
+
+**Dónde verlo:** en el [job de pruebas](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/job/123643184129),
+expandir **Ejecutar pruebas y verificar cobertura mínima**. El respaldo está
+en el [JUnit original](docs/evidencias/run-40929310543/pytest.xml) y el
+[XML de cobertura](docs/evidencias/run-40929310543/coverage.xml).
+
+La [suite](tests) cubre CRUD, validación, duplicados, paginación, fallos HTTP,
+resúmenes e integridad de artefactos. Utiliza SQLite en memoria y HTTP simulado.
+El despliegue agrega comprobaciones reales sobre contenedores. La cobertura
+anterior mide los servicios Python; no mide el frontend JavaScript.
+
+<a id="sonarqube"></a>
+
+## 3. Evidencia del análisis con SonarQube
+
+| Medición | Resultado conservado |
+| --- | --- |
+| Quality Gate | **OK**. |
+| Clasificación de seguridad | **A**, valor numérico 1. |
+| Cobertura recibida por SonarQube | **99,6%**. |
+| Observaciones abiertas | **0**. |
+| Security hotspots | **0**. |
+| Salida del escáner | **0**, análisis completado. |
+
+**Dónde verlo:** abrir el [job de SonarQube](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/job/123643538609)
+y expandir **Analizar código y exigir aprobación del Quality Gate**. El resultado
+también se puede leer en el [reporte del gate](docs/evidencias/run-40929310543/sonarqube-quality-gate.json),
+las [observaciones](docs/evidencias/run-40929310543/sonarqube-issues.json) y los
+[hotspots](docs/evidencias/run-40929310543/sonarqube-hotspots.json).
+
+Se analizan los servicios Python, el frontend y los Dockerfile. El pipeline
+crea una instancia temporal de SonarQube en el runner. Sus resultados quedan
+en los logs y reportes aunque esa instancia se retire al finalizar.
+
+Las auditorías de dependencias también terminaron sin avisos:
+[usuarios, 23 paquetes](docs/evidencias/run-40929310543/pip-audit-usuarios.json),
+[estadísticas, 14](docs/evidencias/run-40929310543/pip-audit-estadisticas.json) y
+[entorno, 59](docs/evidencias/run-40929310543/pip-audit-entorno.json).
+El [workflow](.github/workflows/CI.yml) bloquea las etapas siguientes cuando una
+prueba, auditoría o gate falla. La
+[ejecución inicial bloqueada](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40920411784)
+registra ese comportamiento ante una dependencia vulnerable, posteriormente corregida.
+
+<a id="despliegue"></a>
+
+## 4. Pipeline, despliegue y trazabilidad
+
+| Orden | Job | Comprobación |
+| --- | --- | --- |
+| 1 | `validate` | Pruebas, cobertura y auditorías de dependencias. |
+| 2 | `sonar` | Análisis y aprobación de SonarQube. |
+| 3 | `build` | Construcción y verificación de ambas imágenes. |
+| 4 | `deploy` | Carga del paquete en otro runner, Compose, pruebas y limpieza. |
+
+**Dónde verlo:** el [job de despliegue](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543/job/123645208503)
+verificó salud, CRUD, estadísticas y persistencia al recrear usuarios. El
+[reporte de despliegue](docs/evidencias/run-40929310543/despliegue-simulado.json)
+registra estado `passed`, etapa `completed` y limpieza completa, junto a los
+[logs de los servicios](docs/evidencias/run-40929310543/despliegue-simulado.log).
+
+Las imágenes llevan el SHA completo del commit y etiquetas OCI de revisión y
+repositorio. El manifiesto registra sus identificadores, checksum y ejecución
+de origen. El despliegue verifica esos datos y usa el paquete construido, sin
+reconstruir los servicios. La URL del runner existe durante la simulación y
+deja de estar disponible después de retirar el entorno.
+
+<a id="evidencias"></a>
+
+## 5. Correspondencia con la rúbrica
+
+| Indicador | Implementación y evidencia principal |
+| --- | --- |
+| IE1: contenedores | Dos microservicios distintos y Dockerfile independientes; ver sección 1 y job `build`. |
+| IE2: pruebas | 57 casos aprobados y cobertura 99,60%; ver sección 2. |
+| IE3: seguridad y escalabilidad | SonarQube, auditorías, bloqueos, límites y tres réplicas comprobados. Dependabot está configurado y su activación sigue pendiente. |
+| IE4: despliegue y trazabilidad | Paquete identificado por commit, verificado y desplegado en otro runner; ver sección 4. |
+| IE5: orquestación | Compose con redes, volumen, salud, dependencias, proxy y recuperación; ver sección 1. |
+
+Los [reportes originales](docs/evidencias/run-40929310543) se conservan en el
+repositorio porque los artefactos de Actions tienen retención de siete días.
+Sus [checksums](docs/evidencias/run-40929310543/SHA256SUMS.txt) permiten detectar
+cambios en las copias. El paquete binario de imágenes no se almacena en Git.
+El estado de Compose en `*.containers.json` conserva NDJSON, un objeto por línea.
+
+La [revisión posterior del PR #7](https://github.com/SebaOre/Devops_Ev-1/actions/runs/41065429464)
+también aprobó sus cuatro etapas el 30 de octubre. Se conserva su
+[resumen de ejecución](docs/evidencias/revision-pr7-2026-10-30.json).
+
+## 6. Cómo ejecutar la aplicación
+
+Con Docker Desktop en modo Linux, Compose y Python 3.11 o posterior, desde la raíz:
 
 ```powershell
 python scripts/iniciar_compose.py
 docker compose ps
 ```
 
-El lanzador construye ambas imágenes y espera su salud. En Windows usa
-`docker build` seguido de Compose para evitar el fallo de Bake observado con
-los caracteres de esta ruta. No requiere crear `.env`.
+Abrir [localhost:18080](http://localhost:18080/) para la interfaz,
+[/docs](http://localhost:18080/docs) para la API de usuarios y
+[/stats](http://localhost:18080/stats) para estadísticas. Estas direcciones son
+locales al equipo donde se inicia Docker.
 
-| Dirección | Contenido |
-| --- | --- |
-| [localhost:18080](http://localhost:18080/) | Interfaz de usuarios. |
-| [Usuarios](http://localhost:18080/users/) | API de usuarios. |
-| [Swagger](http://localhost:18080/docs) | Operaciones de usuarios. |
-| [Estadísticas](http://localhost:18080/stats) | Resumen por dominio. |
-| [Salud](http://localhost:18080/health) | Salud de usuarios. |
+Las instrucciones de pruebas, SonarQube, escalado, detención y resolución de
+problemas están reunidas en un solo [manual técnico](docs/MANUAL_TECNICO.md).
 
-Escalar estadísticas y detener conservando los datos:
+<a id="uso-de-ia"></a>
 
-```powershell
-docker compose up -d --scale estadisticas=3 --wait
-docker compose down
-```
+## 7. Uso de inteligencia artificial
 
-Ver [COMPOSE.md](docs/COMPOSE.md) para puertos, recursos, persistencia y escalado.
+Se utilizó **Codex de OpenAI** los días 29 y 30 de octubre de 2026. La asistencia
+incluyó revisión de requisitos, generación y modificación de código, pruebas,
+Dockerfile, Compose, GitHub Actions, scripts, diagramas y documentación descriptiva.
+También incluyó ejecución de herramientas e interpretación de sus resultados.
+Las firmas de Git identifican la cuenta utilizada y no distinguen por sí solas
+trabajo manual y asistencia.
 
-## Pipeline CI/CD
+Este alcance incluye código y configuración. Los integrantes deben revisar con
+el docente su admisibilidad conforme a la pauta. La revisión del contenido por
+el equipo sigue pendiente. Las justificaciones, conclusiones y reflexiones
+personales quedan reservadas a la redacción de los estudiantes sin IA en el
+[archivo del equipo](docs/APORTES_Y_CONCLUSIONES.md).
 
-[CI.yml](.github/workflows/CI.yml) se activa con pushes a `main`, `develop`,
-`feature/**` y `codex/**`, Pull Requests hacia `main` o `develop`, y ejecución
-manual. Utiliza Ubuntu 24.04 y Python 3.11.
+Referencia de la herramienta: OpenAI, **Codex**, aplicación de escritorio,
+conversación de apoyo a EP2 DOY0101, 29-30 de octubre de 2026,
+[página del producto](https://openai.com/codex/). La conversación original y los
+cambios del repositorio registran la asistencia; no se generó un enlace público
+de la conversación. Guía de citación indicada por la pauta:
+[Bibliotecas Duoc UC, Inteligencia Artificial](https://bibliotecas.duoc.cl/ia).
+El equipo debe adecuar el formato de la referencia a la indicación del docente.
 
-| Job | Operaciones y aprobación |
-| --- | --- |
-| `validate` | Sintaxis, PyTest, cobertura mínima del 90% y tres auditorías de dependencias con `pip-audit`. |
-| `sonar` | Necesita `validate`; recupera cobertura y exige Quality Gate: seguridad A y cobertura mínima del 90%. |
-| `build` | Necesita pruebas y SonarQube; construye, etiqueta por SHA, empaqueta y verifica ambas imágenes. |
-| `deploy` | Necesita las etapas anteriores; carga ese paquete en otro runner, despliega Compose, prueba APIs y persistencia, guarda evidencia y retira el entorno. |
+<a id="como-entregar"></a>
 
-Los fallos bloquean las etapas dependientes y generan anotaciones de error.
-No se utiliza `continue-on-error`. La simulación vive en el runner durante la
-verificación; su URL local no permanece publicada después de la limpieza.
+## 8. Cómo entregar este trabajo
 
-## Trazabilidad y calidad
+**La entrega se realiza con un enlace de GitHub.** El profesor abre el README,
+revisa las tres evidencias de la primera tabla y consulta el manual si necesita
+reproducir la aplicación. Los JSON, XML y logs quedan como respaldo.
 
-La [ejecución completa aprobada del 29 de octubre de 2026](https://github.com/SebaOre/Devops_Ev-1/actions/runs/40929310543)
-corresponde al commit `0243f603d69c777e197463febb7ded705f8c59f7`:
+El [enlace actual de EP2](https://github.com/SebaOre/Devops_Ev-1/tree/feature/evaluacion-2)
+abre esta versión del trabajo. El enlace general del repositorio abre `main`,
+que todavía contiene la versión anterior. La integración se prepara en el
+[PR #7](https://github.com/SebaOre/Devops_Ev-1/pull/7).
 
-- **57 pruebas aprobadas**, cobertura de servicios de **99,60%**.
-- Auditorías de usuarios, estadísticas y entorno sin vulnerabilidades conocidas.
-- SonarQube: gate `OK`, seguridad A, cero observaciones y hotspots.
-- Las mismas imágenes construidas se cargaron y ejecutaron en el despliegue.
-- CRUD, comunicación HTTP, persistencia y limpieza aprobados.
+Una vez completada y revisada la entrega, integrar el PR en `main`, comprobar
+Dependabot y usar [el enlace del repositorio](https://github.com/SebaOre/Devops_Ev-1)
+en AVA y en el correo al docente, dentro del plazo establecido. No se ha
+realizado ese envío desde esta conversación.
 
-Las etiquetas OCI registran revisión y repositorio. El manifiesto conserva
-referencias, identificadores, checksum SHA-256 y ejecución de origen. El
-despliegue comprueba esos datos antes de iniciar Compose. Los artefactos de
-Actions se conservan siete días; una copia revisada de los reportes está en
-[EVIDENCIAS.md](docs/EVIDENCIAS.md).
+Texto breve para acompañar el enlace, una vez completados los pendientes:
 
-La suite usa SQLite en memoria y HTTP simulado; Docker y el despliegue se prueban
-además con contenedores reales. La cobertura publicada mide Python y no las
-líneas del frontend JavaScript.
+> Profesor/a: compartimos el repositorio de la Evaluación Parcial 2 de DOY0101.
+> El README reúne los dos microservicios Docker y los enlaces a las ejecuciones
+> de pruebas, SonarQube y despliegue. También incluye los reportes de respaldo
+> y las instrucciones para ejecutar la aplicación. Integrantes: [nombres].
 
-## Pruebas locales
+<a id="pendientes-de-entrega"></a>
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-test.txt -r requirements-security.txt
-.\.venv\Scripts\python.exe -m pytest
-.\.venv\Scripts\python.exe scripts/auditar_dependencias.py
-```
+### Pendientes antes del envío final
 
-[Dependabot](.github/dependabot.yml) está configurado. Su integración en la rama
-predeterminada y la protección de ramas siguen pendientes de la revisión final;
-`needs` ya bloquea las etapas del pipeline ante fallos.
+- Completar nombres, aportes, justificaciones, conclusiones y reflexiones en
+  **un solo archivo:** [APORTES_Y_CONCLUSIONES.md](docs/APORTES_Y_CONCLUSIONES.md).
+- Validar en equipo el contenido descriptivo y revisar el alcance de IA con el docente.
+- Integrar la versión final en `main`, activar/comprobar Dependabot y revisar
+  los ajustes de seguridad y checks exigidos.
+- Comprobar la revisión final y enviar el enlace por AVA y correo.
 
-## Documentación y entrega
-
-| Documento | Contenido |
-| --- | --- |
-| [Docker](docs/DOCKER.md) / [Compose](docs/COMPOSE.md) | Construcción, redes, persistencia, límites y escalado. |
-| [Pruebas](docs/PRUEBAS.md) / [Seguridad](docs/SEGURIDAD.md) | Casos, cobertura, auditorías, SonarQube y bloqueos. |
-| [Pipeline](docs/PIPELINE.md) / [Despliegue](docs/DESPLIEGUE.md) | Orden, artefactos, identidad y simulación. |
-| [Evidencias](docs/EVIDENCIAS.md) | Relación con IE1-IE5 y resultados conservados. |
-| [Uso de IA](docs/USO_IA.md) | Herramienta, alcance real y referencias. |
-| [Equipo](docs/EQUIPO.md) | Identificación y aportes pendientes de completar. |
-| [Justificaciones](docs/JUSTIFICACIONES_EQUIPO.md) | Sección reservada a la autoría del equipo. |
-| [Conclusiones](docs/CONCLUSIONES.md) | Secciones personales sin respuestas generadas por IA. |
-| [Entrega](docs/ENTREGA_EP2.md) | Comprobaciones y pendientes antes de entregar. |
-
-La documentación descriptiva contó con asistencia de IA y requiere revisión
-del equipo. Las conclusiones, justificaciones técnicas y reflexiones deben
-completarse con autoría de los estudiantes, según la pauta.
-El README anterior se conserva en [EA1_README_ORIGINAL.md](docs/EA1_README_ORIGINAL.md).
+**Progreso:** pasos 1-8 verificados; 9 y 10 siguen pendientes de los textos del
+equipo, la revisión y la integración definitiva. Los registros históricos se
+conservan en Git; el informe de entrega es este README.
