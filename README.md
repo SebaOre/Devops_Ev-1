@@ -17,7 +17,7 @@ backend/        Usuarios: código, frontend y Dockerfile              (punto 1)
 estadisticas/   Estadísticas: código y Dockerfile                    (punto 1)
 tests/          Pruebas automatizadas                               (punto 2)
 devops/         Automatización, Nginx y configuración de SonarQube   (puntos 2 a 4)
-docs/           Manual, aportes y evidencias                         (punto 5)
+docs/           Manual y evidencias                                  (punto 5)
 README.md       Informe principal                                   (punto 5)
 compose.yaml    Orquestación de los contenedores                     (punto 4)
 ```
@@ -197,13 +197,23 @@ problemas están reunidas en un solo [manual técnico](docs/MANUAL_TECNICO.md).
 
 ## 7. Uso de inteligencia artificial
 
-La asistencia incluyó revisión de requisitos, modificación de código, pruebas y documentación descriptiva.
+La asistencia incluyó revisión de requisitos, modificación de código, pruebas,
+documentación y redacción de la conclusión general.
 También incluyó interpretación de sus resultados.
 Las firmas de Git identifican la cuenta utilizada y no distinguen por sí solas
 trabajo manual y asistencia.
 
-[archivo del equipo](docs/APORTES_Y_CONCLUSIONES.md).
+[Conclusión del trabajo](#conclusion).
 
 Referencia de la herramienta: OpenAI
-<a id="como-entregar"></a>
+<a id="conclusion"></a>
+
+## 8. Conclusión
+
+En esta evaluación aprendimos a automatizar la integración y el despliegue de
+dos microservicios mediante GitHub Actions. Utilizamos Docker y Docker Compose
+para ejecutar y coordinar los servicios, incorporamos pruebas con PyTest y
+revisamos la seguridad con SonarQube. Este trabajo nos permitió comprender la
+importancia de validar los cambios, detectar errores a tiempo y mantener un
+proceso de entrega trazable y reproducible.
 

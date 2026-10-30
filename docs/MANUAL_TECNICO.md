@@ -2,8 +2,7 @@
 
 Instrucciones para ejecutar, comprobar y administrar la solución.
 El informe y las evidencias para el docente están en [README.md](../README.md).
-Los aportes y textos propios se completan en
-[APORTES_Y_CONCLUSIONES.md](APORTES_Y_CONCLUSIONES.md).
+La [conclusión del trabajo](../README.md#conclusion) está en el mismo README.
 
 - [Docker e inicio local](#docker)
 - [Compose, persistencia y escalado](#compose)
@@ -326,7 +325,7 @@ ocupado por otro servicio del equipo.
 | `tests/` | Pruebas automatizadas. |
 | `.github/` | Pipeline y Dependabot. |
 | `devops/` | Scripts de automatización, `nginx.conf` y `sonarqube-images.json`. |
-| `docs/` | Manual, aportes y evidencias. |
+| `docs/` | Manual y evidencias. |
 
 Referencias: [Compose y salud](https://docs.docker.com/compose/how-tos/startup-order/),
 [Dependabot](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference),
