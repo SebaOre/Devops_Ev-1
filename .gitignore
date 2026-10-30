@@ -12,3 +12,4 @@ reports/
 .scannerwork/
 artifacts/
 tmp/
+.vscode/

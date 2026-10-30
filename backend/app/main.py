@@ -10,7 +10,7 @@ from .database import get_db, init_db
 from .routers import users
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
-FRONTEND_DIR = BACKEND_DIR.parent / "frontend"
+FRONTEND_DIR = BACKEND_DIR / "frontend"
 
 
 @asynccontextmanager

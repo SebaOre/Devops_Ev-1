@@ -23,7 +23,7 @@ Requisitos: Docker Desktop con motor Linux, Docker Compose y Python 3.11 o
 posterior para los scripts. Ejecutar desde la raíz del repositorio:
 
 ```powershell
-python scripts/iniciar_compose.py
+python devops/iniciar_compose.py
 docker compose ps
 ```
 
@@ -151,8 +151,8 @@ servicios Python y genera rutas relativas para SonarQube.
 Comprobaciones reales con Docker, sobre imágenes locales construidas:
 
 ```powershell
-python scripts/verificar_docker.py
-python scripts/verificar_compose.py
+python devops/verificar_docker.py
+python devops/verificar_compose.py
 ```
 
 Los scripts crean y retiran sus propios recursos. Comprueban comunicación,
@@ -198,7 +198,7 @@ locks anteriores corresponden al entorno Linux validado de contenedores y CI.
 Auditar las dependencias de cada servicio y el entorno instalado:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/auditar_dependencias.py
+.\.venv\Scripts\python.exe devops/auditar_dependencias.py
 ```
 
 Se auditan los locks completos de ambos servicios, sin volver a resolver otras
@@ -212,7 +212,7 @@ Ejecutar SonarQube local después de generar cobertura:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest
-.\.venv\Scripts\python.exe scripts/sonarqube_local.py
+.\.venv\Scripts\python.exe devops/sonarqube_local.py
 ```
 
 El script necesita Docker Linux y reserva al menos 10 GB libres si las imágenes
@@ -221,7 +221,7 @@ el escáner de 2 GiB. En el equipo utilizado se ejecutaron análisis y
 construcciones por separado; WSL tiene límites de 6 GB de memoria y 1 GB de swap.
 
 Las imágenes de SonarQube y Scanner están fijadas por digest en
-`security/sonarqube-images.json`. La copia de análisis excluye bases, caches y
+`devops/sonarqube-images.json`. La copia de análisis excluye bases, caches y
 credenciales. Los tokens temporales se revocan al terminar. Las credenciales
 locales quedan en `.sonar-local/credentials.json`, excluido de Git y Docker.
 
@@ -258,8 +258,8 @@ y tiene retención de siete días. No requiere un registro de imágenes externo.
 Para comprobar cambios locales sin atribuirlos a un commit:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/construir_imagenes.py --local
-.\.venv\Scripts\python.exe scripts/verificar_artefactos.py --load --revision working-tree
+.\.venv\Scripts\python.exe devops/construir_imagenes.py --local
+.\.venv\Scripts\python.exe devops/verificar_artefactos.py --load --revision working-tree
 ```
 
 El modo local usa una etiqueta aleatoria y revisión `working-tree`. Requiere
@@ -295,8 +295,8 @@ en GitHub, usar **Re-run all jobs**: se exige paquete del mismo intento.
 Con el paquete local generado en el punto anterior:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/desplegar_simulado.py --revision working-tree
-.\.venv\Scripts\python.exe scripts/desplegar_simulado.py --revision working-tree --simulate-failure
+.\.venv\Scripts\python.exe devops/desplegar_simulado.py --revision working-tree
+.\.venv\Scripts\python.exe devops/desplegar_simulado.py --revision working-tree --simulate-failure
 ```
 
 El primer comando debe aprobar y limpiar sus recursos. El segundo es un ensayo
@@ -321,10 +321,12 @@ ocupado por otro servicio del equipo.
 
 | Carpeta | Contenido |
 | --- | --- |
-| `backend/`, `estadisticas/`, `frontend/` | Código de la aplicación. |
-| `tests/`, `scripts/` | Pruebas y automatización. |
-| `.github/`, `infra/`, `security/` | Pipeline, proxy y versiones de SonarQube. |
-| `docs/evidencias/` | Copias seleccionadas y salida real de Docker. |
+| `backend/` | Usuarios, interfaz en `backend/frontend/` y su Dockerfile. |
+| `estadisticas/` | Segundo microservicio y su Dockerfile. |
+| `tests/` | Pruebas automatizadas. |
+| `.github/` | Pipeline y Dependabot. |
+| `devops/` | Scripts de automatización, `nginx.conf` y `sonarqube-images.json`. |
+| `docs/` | Manual, aportes y evidencias. |
 
 Referencias: [Compose y salud](https://docs.docker.com/compose/how-tos/startup-order/),
 [Dependabot](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference),

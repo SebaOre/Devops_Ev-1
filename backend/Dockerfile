@@ -17,7 +17,7 @@ RUN python -m pip install --only-binary :all: --require-hashes \
     && chown app:app /data
 
 COPY backend/app ./app
-COPY frontend /app/frontend
+COPY backend/frontend ./frontend
 
 USER 10001:10001
 

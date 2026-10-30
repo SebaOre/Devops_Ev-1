@@ -50,13 +50,13 @@ jobs:
         run: python -m pytest
 
       - name: Auditar dependencias y bloquear si hay vulnerabilidades
-        run: python scripts/auditar_dependencias.py
+        run: python devops/auditar_dependencias.py
 
       - name: Verificar estructura
         run: |
           test -f backend/app/main.py
           test -f backend/requirements.txt
-          test -f frontend/index.html
+          test -f backend/frontend/index.html
           test -f estadisticas/app/main.py
           test -f estadisticas/requirements.txt
 
@@ -97,7 +97,7 @@ jobs:
         run: sudo sysctl -w vm.max_map_count=524288
 
       - name: Analizar codigo y exigir aprobacion del Quality Gate
-        run: python scripts/sonarqube_local.py --ci
+        run: python devops/sonarqube_local.py --ci
 
       - name: Guardar resultados de SonarQube
         if: always()
@@ -133,10 +133,10 @@ jobs:
         run: docker compose config --quiet
 
       - name: Construir ambas imagenes y guardar su manifiesto
-        run: python scripts/construir_imagenes.py
+        run: python devops/construir_imagenes.py
 
       - name: Verificar el paquete que recibira el despliegue
-        run: python scripts/verificar_artefactos.py --load
+        run: python devops/verificar_artefactos.py --load
 
       - name: Guardar imagenes y trazabilidad del commit
         uses: actions/upload-artifact@v7
@@ -177,7 +177,7 @@ jobs:
       - name: Desplegar las imagenes y probar el entorno temporal
         env:
           EXPECTED_REVISION: ${{ needs.build.outputs.revision }}
-        run: python scripts/desplegar_simulado.py --revision "$EXPECTED_REVISION"
+        run: python devops/desplegar_simulado.py --revision "$EXPECTED_REVISION"
 
       - name: Guardar evidencia y diagnostico del despliegue
         if: always()

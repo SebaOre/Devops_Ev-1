@@ -96,7 +96,7 @@ def configure_project(base, password):
 
 def prepare_scan_context(destination):
     """Copia solo fuentes y configuracion, sin caches, bases ni credenciales."""
-    for folder in ("backend/app", "estadisticas/app", "frontend", "tests"):
+    for folder in ("backend/app", "estadisticas/app", "backend/frontend", "tests"):
         shutil.copytree(
             ROOT / folder, destination / folder,
             ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
@@ -124,7 +124,7 @@ def main():
     args = parser.parse_args()
     if docker("info", "--format", "{{.OSType}}").stdout.strip() != "linux":
         raise RuntimeError("Se necesita un motor Docker Linux disponible")
-    images = json.loads((ROOT / "security/sonarqube-images.json").read_text())
+    images = json.loads((ROOT / "devops/sonarqube-images.json").read_text())
     cached = all(
         docker("image", "inspect", image, check=False).returncode == 0
         for image in images.values()
