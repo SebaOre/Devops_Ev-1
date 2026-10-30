@@ -176,10 +176,6 @@ Sus [checksums](docs/evidencias/run-40929310543/SHA256SUMS.txt) permiten detecta
 cambios en las copias. El paquete binario de imágenes no se almacena en Git.
 El estado de Compose en `*.containers.json` conserva NDJSON, un objeto por línea.
 
-La [revisión posterior del PR #7](https://github.com/SebaOre/Devops_Ev-1/actions/runs/41065429464)
-también aprobó sus cuatro etapas el 30 de octubre. Se conserva su
-[resumen de ejecución](docs/evidencias/revision-pr7-2026-10-30.json).
-
 ## 6. Cómo ejecutar la aplicación
 
 Con Docker Desktop en modo Linux, Compose y Python 3.11 o posterior, desde la raíz:
@@ -211,41 +207,3 @@ trabajo manual y asistencia.
 Referencia de la herramienta: OpenAI
 <a id="como-entregar"></a>
 
-## 8. Cómo entregar este trabajo
-
-**La entrega se realiza con un enlace de GitHub.** El profesor abre el README,
-revisa las tres evidencias de la primera tabla y consulta el manual si necesita
-reproducir la aplicación. Los JSON, XML y logs quedan como respaldo.
-
-El [PR #7](https://github.com/SebaOre/Devops_Ev-1/pull/7) integró la implementación
-de EP2 en `main`. La [rama de reorganización](https://github.com/SebaOre/Devops_Ev-1/tree/codex/ordenar-estructura)
-permite revisar esta distribución de carpetas antes de integrarla también.
-El [enlace general del repositorio](https://github.com/SebaOre/Devops_Ev-1) abre
-la versión de `main` que verá el docente.
-
-Una vez completada y revisada la entrega, integrar la reorganización en `main`, comprobar
-Dependabot y usar [el enlace del repositorio](https://github.com/SebaOre/Devops_Ev-1)
-en AVA y en el correo al docente, dentro del plazo establecido. No se ha
-realizado ese envío desde esta conversación.
-
-Texto breve para acompañar el enlace, una vez completados los pendientes:
-
-> Profesor/a: compartimos el repositorio de la Evaluación Parcial 2 de DOY0101.
-> El README reúne los dos microservicios Docker y los enlaces a las ejecuciones
-> de pruebas, SonarQube y despliegue. También incluye los reportes de respaldo
-> y las instrucciones para ejecutar la aplicación. Integrantes: [nombres].
-
-<a id="pendientes-de-entrega"></a>
-
-### Pendientes antes del envío final
-
-- Completar nombres, aportes, justificaciones, conclusiones y reflexiones en
-  **un solo archivo:** [APORTES_Y_CONCLUSIONES.md](docs/APORTES_Y_CONCLUSIONES.md).
-- Validar en equipo el contenido descriptivo y revisar el alcance de IA con el docente.
-- Integrar la versión final en `main`, activar/comprobar Dependabot y revisar
-  los ajustes de seguridad y checks exigidos.
-- Comprobar la revisión final y enviar el enlace por AVA y correo.
-
-**Progreso:** pasos 1-8 verificados; 9 y 10 siguen pendientes de los textos del
-equipo, la revisión y la integración definitiva. Los registros históricos se
-conservan en Git; el informe de entrega es este README.
