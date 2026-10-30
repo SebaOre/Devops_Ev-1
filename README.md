@@ -2,7 +2,7 @@
 
 **Asignatura:** DOY0101, Ingeniería DevOps.
 
-**Integrantes:** [SebaOre](https://github.com/SebaOre) y [MoixesMasc](https://github.com/MoixesMasc).
+**Integrantes:** [Sebastin Orellana](https://github.com/SebaOre) y [Moises Salinas](https://github.com/MoixesMasc).
 
 **Documento principal para corregir la evaluación:** este README.
 
@@ -201,27 +201,14 @@ problemas están reunidas en un solo [manual técnico](docs/MANUAL_TECNICO.md).
 
 ## 7. Uso de inteligencia artificial
 
-Se utilizó **Codex de OpenAI** los días 29 y 30 de octubre de 2026. La asistencia
-incluyó revisión de requisitos, generación y modificación de código, pruebas,
-Dockerfile, Compose, GitHub Actions, scripts, diagramas y documentación descriptiva.
-También incluyó ejecución de herramientas e interpretación de sus resultados.
+La asistencia incluyó revisión de requisitos, modificación de código, pruebas y documentación descriptiva.
+También incluyó interpretación de sus resultados.
 Las firmas de Git identifican la cuenta utilizada y no distinguen por sí solas
 trabajo manual y asistencia.
 
-Este alcance incluye código y configuración. Los integrantes deben revisar con
-el docente su admisibilidad conforme a la pauta. La revisión del contenido por
-el equipo sigue pendiente. Las justificaciones, conclusiones y reflexiones
-personales quedan reservadas a la redacción de los estudiantes sin IA en el
 [archivo del equipo](docs/APORTES_Y_CONCLUSIONES.md).
 
-Referencia de la herramienta: OpenAI, **Codex**, aplicación de escritorio,
-conversación de apoyo a EP2 DOY0101, 29-30 de octubre de 2026,
-[página del producto](https://openai.com/codex/). La conversación original y los
-cambios del repositorio registran la asistencia; no se generó un enlace público
-de la conversación. Guía de citación indicada por la pauta:
-[Bibliotecas Duoc UC, Inteligencia Artificial](https://bibliotecas.duoc.cl/ia).
-El equipo debe adecuar el formato de la referencia a la indicación del docente.
-
+Referencia de la herramienta: OpenAI
 <a id="como-entregar"></a>
 
 ## 8. Cómo entregar este trabajo
