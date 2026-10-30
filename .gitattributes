@@ -1,2 +1,2 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Conservar los bytes de las evidencias para verificar sus checksums en cualquier SO.
+docs/evidencias/** -text
