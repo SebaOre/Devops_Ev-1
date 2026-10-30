@@ -9,6 +9,8 @@
 - [x] Despliegue automático simulado trazable desde el paquete de imágenes.
 - [x] Evidencias y documentación descriptiva del funcionamiento.
 - [x] Declaración del alcance real de la asistencia de IA.
+- [x] Rama de EP2 sincronizada con los cambios existentes de `main`.
+- [x] Pull Request en borrador preparado para revisar la integración.
 
 ## Pendiente antes de entregar
 
@@ -24,6 +26,19 @@
 
 Repositorio: [SebaOre/Devops_Ev-1](https://github.com/SebaOre/Devops_Ev-1).
 Rama de EP2: `feature/evaluacion-2`.
+Revisión preparada: [Pull Request #7](https://github.com/SebaOre/Devops_Ev-1/pull/7),
+en borrador mientras se completan los textos de autoría del equipo.
+
+La consulta de ajustes del 30 de octubre confirmó repositorio público,
+`main` como rama predeterminada, ausencia de protección de esa rama y
+actualizaciones de seguridad de Dependabot deshabilitadas. La integración
+en `main` y esos ajustes permanecen pendientes; los bloqueos entre jobs ya
+forman parte del workflow.
+
+La [revisión técnica del PR](https://github.com/SebaOre/Devops_Ev-1/actions/runs/41065429464)
+aprobó sus cuatro etapas para la revisión registrada en
+[EVIDENCIAS.md](EVIDENCIAS.md). La comprobación final de entrega sigue pendiente
+de incorporar los textos propios del equipo e integrar la versión revisada.
 
 La pauta solicita entrega mediante enlace de GitHub. Este registro no afirma
 que el enlace ya se haya enviado a AVA ni al correo del docente. No se dispone

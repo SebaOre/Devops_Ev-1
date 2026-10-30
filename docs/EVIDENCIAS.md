@@ -74,3 +74,24 @@ dependen de la fecha y de la base de avisos consultada. La cobertura mide los
 servicios Python; el frontend tiene análisis estático y una comprobación DOM
 local documentada en [SEGURIDAD.md](SEGURIDAD.md). La simulación es temporal y
 no representa un servicio productivo publicado permanentemente.
+
+## Entorno local actualizado el 30 de octubre
+
+El [reporte de arranque](evidencias/comprobaciones-locales/arranque-2026-10-30.json)
+registra los tres servicios saludables, respuestas HTTP 200 en interfaz, salud
+y estadísticas, y el volumen `devops-ep2_usuarios_data` conservado. Ambos
+contenedores Python informaron pip 26.2.2, setuptools 84.1.0 y `pip check`
+correcto después de reconstruir sus imágenes.
+
+## Revisión del Pull Request del 30 de octubre
+
+La [ejecución del PR #7](https://github.com/SebaOre/Devops_Ev-1/actions/runs/41065429464)
+aprobó sus cuatro jobs. Su [resumen conservado](evidencias/revision-pr7-2026-10-30.json)
+identifica la rama revisada con HEAD `7cd90aa95c5c343ea09d275892481727acf339e8`.
+Los artefactos del PR identifican el commit de integración
+`96461873b260fd7ddb981bc021d0dfe9873f8707`. La
+[ejecución por push](https://github.com/SebaOre/Devops_Ev-1/actions/runs/41065403208)
+también terminó correctamente.
+
+Estas comprobaciones corresponden a las revisiones citadas. Los registros de
+documentación posteriores no se presentan como nuevas ejecuciones del pipeline.

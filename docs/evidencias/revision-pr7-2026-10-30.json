@@ -1,0 +1,63 @@
+{
+  "run": {
+    "id": 41065429464,
+    "head_sha": "7cd90aa95c5c343ea09d275892481727acf339e8",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/SebaOre/Devops_Ev-1/actions/runs/41065429464",
+    "created_at": "2026-10-30T13:42:22Z",
+    "updated_at": "2026-10-30T13:47:17Z"
+  },
+  "jobs": [
+    {
+      "id": 124095343307,
+      "name": "Validar y probar microservicios",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 124095801851,
+      "name": "SonarQube - Quality Gate",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 124096931124,
+      "name": "Construir y empaquetar imagenes",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 124097562907,
+      "name": "Desplegar y verificar entorno simulado",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 12982881416,
+      "name": "pruebas-y-dependencias",
+      "size_in_bytes": 3958,
+      "expired": false
+    },
+    {
+      "id": 12982463714,
+      "name": "sonarqube",
+      "size_in_bytes": 854,
+      "expired": false
+    },
+    {
+      "id": 12982238572,
+      "name": "imagenes-96461873b260fd7ddb981bc021d0dfe9873f8707",
+      "size_in_bytes": 81851725,
+      "expired": false
+    },
+    {
+      "id": 12980659948,
+      "name": "despliegue-96461873b260fd7ddb981bc021d0dfe9873f8707",
+      "size_in_bytes": 3627,
+      "expired": false
+    }
+  ]
+}

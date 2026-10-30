@@ -300,3 +300,28 @@ es publico y esa rama aun no tiene proteccion. Las actualizaciones de seguridad
 de Dependabot estaban deshabilitadas al consultar los ajustes. La configuracion
 de EP2 sigue en `feature/evaluacion-2`; su integracion y activacion quedan
 pendientes de la revision final. Los detalles estan en `docs/ENTREGA_EP2.md`.
+
+Se sincronizo `origin/main` en la rama de EP2, resolviendo el conflicto del
+README con la documentacion actual y conservando el antecedente de EA1.
+Se preparo el [Pull Request #7 en borrador](https://github.com/SebaOre/Devops_Ev-1/pull/7).
+La integracion definitiva espera los textos de los integrantes y la revision
+de entrega.
+
+El 30 de octubre se reconstruyeron las imagenes locales con pip 26.2.2 y
+setuptools 84.1.0. `pip check` aprobo en ambos servicios y los tres contenedores
+quedaron saludables. Interfaz, salud y estadisticas respondieron HTTP 200,
+conservando el volumen de usuarios. Se agrego una cuarta evidencia local,
+`docs/evidencias/comprobaciones-locales/arranque-2026-10-30.json`.
+
+La [revision del Pull Request](https://github.com/SebaOre/Devops_Ev-1/actions/runs/41065429464)
+aprobo sus cuatro jobs el 30 de octubre: pruebas/auditorias, SonarQube,
+construccion y despliegue simulado. La rama revisada tenia HEAD
+`7cd90aa95c5c343ea09d275892481727acf339e8`; los artefactos del PR corresponden al
+commit de integracion `96461873b260fd7ddb981bc021d0dfe9873f8707`.
+La [ejecucion por push](https://github.com/SebaOre/Devops_Ev-1/actions/runs/41065403208)
+de esa rama tambien aprobo. El resumen remoto se conserva en
+`docs/evidencias/revision-pr7-2026-10-30.json`.
+
+Los pasos 9 y 10 no se marcan terminados: faltan los textos propios del equipo,
+su revision del contenido, la integracion definitiva y la comprobacion de
+Dependabot y ajustes de entrega.
